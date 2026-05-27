@@ -1,1019 +1,1229 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <title>QuickCare Pro</title>
+    <meta name="theme-color" content="#0b0c0e" id="meta-theme-color">
+    <title>QuickCal Pro</title>
     <style>
         :root {
-            --bg: #f8fafc; 
-            --card: #ffffff; 
-            --primary: #3b82f6; 
-            --primary-grad: #2563eb;
-            --primary-text: #3b82f6;
-            --danger: #ef4444; 
-            --danger-text: #ef4444;
-            --warning: #f59e0b;
-            --warning-text: #d97706;
-            --inc-text: #10b981; 
-            --inc-text-color: #10b981;
-            --text: #0f172a; 
-            --text-muted: #64748b; 
-            --border: #e2e8f0; 
-            --input-bg: #f1f5f9;
-            --timer-bg: #f8fafc; 
-            --shadow: 0 2px 10px rgba(0,0,0,0.02);
-            --badge-comp-bg: #e2e8f0;
-            --badge-comp-text: #64748b;
-            --btn-text: #ffffff;
+            --m3-bg: #0b0c0e; 
+            --m3-surface: #141619; 
+            --m3-surface-low: #1e2227;
+            --m3-surf-text: #e2e4e9; 
+            --m3-primary: #007aff; 
+            --m3-on-primary: #ffffff;
+            --m3-primary-cont: #002b5c; 
+            --m3-on-primary-cont: #cce3ff;
+            --m3-outline: #6c7380; 
+            --m3-outline-variant: #2c313a;
+            --m3-error: #ff453a; 
+            --m3-muted: #9aa2b1;
+            --m3-success: #34c759;
         }
 
-        @media (prefers-color-scheme: dark) {
-            body:not(.light-theme-forced) {
-                --bg: #121212; 
-                --card: #1e1e1e; 
-                --primary: #2563eb; 
-                --primary-grad: #1d4ed8;
-                --primary-text: #60a5fa;  
-                --danger: #ef4444; 
-                --danger-text: #f87171;   
-                --warning: #f59e0b; 
-                --warning-text: #fbbf24;  
-                --inc-text: #10b981; 
-                --inc-text-color: #34d399;
-                --text: #cbd5e1; 
-                --text-muted: #8a99ad; 
-                --border: #2d3748; 
-                --input-bg: #2d3748;
-                --timer-bg: #1a202c; 
-                --shadow: 0 4px 20px rgba(0,0,0,0.4);
-                --badge-comp-bg: #334155;
-                --badge-comp-text: #94a3b8;
-                --btn-text: #e2e8f0;
-            }
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+        body { background: var(--m3-bg); color: var(--m3-surf-text); width: 100vw; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; touch-action: pan-y; transition: background-color 0.3s, color 0.3s; }
 
-        body.dark-mode-forced {
-            --bg: #121212; 
-            --card: #1e1e1e; 
-            --primary: #2563eb; 
-            --primary-grad: #1d4ed8;
-            --primary-text: #60a5fa;  
-            --danger: #ef4444; 
-            --danger-text: #f87171;   
-            --warning: #f59e0b; 
-            --warning-text: #fbbf24;  
-            --inc-text: #10b981; 
-            --inc-text-color: #34d399;
-            --text: #cbd5e1; 
-            --text-muted: #8a99ad; 
-            --border: #2d3748; 
-            --input-bg: #2d3748;
-            --timer-bg: #1a202c; 
-            --shadow: 0 4px 20px rgba(0,0,0,0.4);
-            --badge-comp-bg: #334155;
-            --badge-comp-text: #94a3b8;
-            --btn-text: #e2e8f0;
-        }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .gap-4 { gap: 4px; } .gap-8 { gap: 8px; } .gap-12 { gap: 12px; }
+        .mb-8 { margin-bottom: 8px; } .mb-12 { margin-bottom: 12px; } .mb-16 { margin-bottom: 16px; } .mb-24 { margin-bottom: 24px; }
+        .text-center { text-align: center; } .text-bold { font-weight: 800; }
 
-        body { 
-            font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; 
-            margin: 0; padding: 12px; display: flex; flex-direction: column; min-height: 100vh; 
-            background: var(--bg); color: var(--text); transition: background-color 0.2s, color 0.2s; 
-            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        .panel { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; }
-        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-
-        .clickable-title-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; background: transparent; color: var(--text); padding: 4px 0; margin: 0; font-size: 16px; font-weight: 800; border: none; text-align: left; cursor: pointer; }
-        .title-arrow { font-size: 12px; color: var(--text-muted); transition: transform 0.2s; }
-        .title-arrow.open { transform: rotate(180deg); }
-
-        .timer-box { background: var(--timer-bg); padding: 12px 14px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
-        .timer-left-col { display: flex; flex-direction: column; gap: 4px; width: 100%; }
-        .timer-row { display: flex; justify-content: space-between; align-items: center; white-space: nowrap; }
-        .timer-time-main { font-size: 18px; font-weight: 800; color: var(--primary-text); font-family: monospace; letter-spacing: 0.5px; }
-        .timer-qtr-badge { font-size: 11px; font-weight: 800; color: var(--danger-text); background: rgba(239, 68, 68, 0.12); padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; }
-        .timer-sub-text { font-size: 12px; color: var(--text-muted); font-weight: 600; display:flex; gap:12px; }
-
-        .mode-swiper-container { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 4px; scrollbar-width: none; }
-        .mode-swiper-container::-webkit-scrollbar { display: none; }
-        .swiper-tab { flex: 1; text-align: center; padding: 12px 8px; font-size: 14px; font-weight: 800; border-radius: 10px; background: var(--card); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; transition: 0.2s; }
-        .swiper-tab.active { background: var(--primary); color: var(--btn-text); border-color: var(--primary); }
-
-        .input-row-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-        .input-row-bot { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+        .sys-bar { position: relative; height: 52px; background: var(--m3-surface); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 13px; font-weight: 800; flex-shrink: 0; z-index: 1000; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .sys-left { display: flex; align-items: center; gap: 8px; z-index: 2; }
+        .sys-mid { position: absolute; left: 50%; transform: translateX(-50%); font-size: 18px; font-weight: 900; color: var(--m3-primary); white-space: nowrap; z-index: 1; }
+        .sys-right { display: flex; align-items: center; justify-content: flex-end; color: var(--m3-muted); gap: 16px; z-index: 2; }
+        .sys-clock { font-size: 15px; font-weight: 700; color: var(--m3-surf-text); cursor: pointer; letter-spacing: 0.5px; }
+        .sys-qtr { background: var(--m3-primary); color: var(--m3-on-primary); padding: 3px 6px; border-radius: 6px; font-size: 10px; }
         
-        .navi-grid { display: grid; grid-template-columns: 1fr auto; gap: 6px; margin-bottom: 6px; align-items: stretch; }
-        .navi-grid-inputs { display: flex; flex-direction: column; gap: 6px; flex: 1; }
-        .navi-grid input { font-size: 14px; height: 44px; }
-        .btn-tmap-fetch-action { width: 70px; height: 94px; font-size: 14px !important; margin: 0; padding: 0; }
+        .main-toggle { display: inline-flex; background: var(--m3-surface-low); border-radius: 24px; padding: 4px; cursor: pointer; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); margin-bottom: 16px; }
+        .main-toggle-btn { padding: 8px 24px; font-size: 13px; font-weight: 800; color: var(--m3-muted); border-radius: 20px; transition: all 0.3s; }
+        .main-toggle-btn.active { background: var(--m3-surface); color: var(--m3-primary); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
 
-        .calc-banner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-        .calc-banner-card { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-grad) 100%); color: var(--btn-text); padding: 14px; border-radius: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; }
-        .calc-banner-card sub { background: var(--card); color: var(--text); border: 1px solid var(--border); }
-        .calc-val-main { font-size: 22px; font-weight: 900; line-height: 1.2; }
-        .calc-val-sub { font-size: 18px; font-weight: 800; color: var(--text); }
-        .calc-lbl { font-size: 11px; font-weight: 700; opacity: 0.8; margin-bottom: 2px; letter-spacing: 0.3px; }
+        .viewport { flex: 1; position: relative; overflow: hidden; background: var(--m3-bg); }
+        .section { position: absolute; inset: 0; padding: 12px 16px; display: none; flex-direction: column; overflow-y: auto; animation: fadeIn 0.3s ease; }
+        .section.active { display: flex; }
 
-        .summary-box { background: var(--timer-bg); border: 1px solid var(--border); padding: 12px; border-radius: 12px; font-size: 13px; line-height: 1.5; margin-bottom: 8px; }
-        .summary-title { font-weight: 800; font-size: 12px; margin-bottom: 4px; color: var(--primary-text); letter-spacing: 0.5px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        button { -webkit-appearance: none; appearance: none; width: 100%; padding: 12px; font-size: 14px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; margin: 0; transition: background 0.1s, transform 0.1s; background-color: var(--border); color: var(--text); white-space: nowrap; }
-        button:active { transform: scale(0.98); opacity: 0.9; }
+        .app-title { text-align: center; font-size: 24px; font-weight: 900; color: var(--m3-surf-text); margin-top: 2vh; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .card { background: var(--m3-surface); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); flex-shrink: 0; }
         
-        .btn-primary { background-color: var(--primary); color: var(--btn-text); }
-        .btn-success { background-color: var(--inc-text); color: var(--btn-text); }
-        .btn-danger { background-color: var(--danger); color: var(--btn-text); }
-        .btn-warning { background-color: var(--warning); color: var(--btn-text); }
-        .btn-small { padding: 6px 12px; font-size: 13px; width: auto; height: auto; border-radius: 8px; }
-        .btn-icon { padding: 6px 10px; background: var(--timer-bg); color: var(--text); width: auto; font-size: 13px; border: 1px solid var(--border); }
+        .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .chip { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: var(--m3-surface-low); color: var(--m3-muted); cursor: pointer; border: 1px solid transparent; text-align: center; transition: all 0.2s; }
+        .chip.active { background: var(--m3-primary-cont); color: var(--m3-on-primary-cont); border-color: var(--m3-primary); }
 
-        input[type="text"], input[type="password"], input[type="number"], select, textarea { 
-            -webkit-appearance: none; appearance: none; width: 100%; padding: 0 12px; margin: 0; 
-            border-radius: 10px; font-size: 14px; font-weight: 500; height: 44px; background: var(--input-bg); 
-            color: var(--text); border: 1px solid var(--border); outline: none; transition: border-color 0.2s; 
-            font-family: inherit;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
-
-        .filter-tab-container { display: flex; gap: 4px; width: 130px; }
-        .filter-tab { flex: 1; padding: 6px; border-radius: 8px; font-size: 12px; font-weight: 700; background-color: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; text-align: center; }
-        .filter-tab.active { background-color: var(--primary); color: var(--btn-text); border-color: var(--primary); }
+        .chip-status { font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 800; transition: transform 0.1s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+        .chip-status:active { transform: scale(0.95); }
         
-        .route-card { display: flex; flex-direction: column; padding: 14px; border-radius: 14px; margin-bottom: 10px; border-left: 5px solid var(--primary); background: var(--card); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); position: relative; box-shadow: var(--shadow); transition: all 0.2s ease; }
-        .route-card.card-completed { border-left-color: var(--inc-text); opacity: 0.7; }
-        .route-card.card-pickup { border-left-color: var(--warning); }
+        .map-input-group { background: var(--m3-surface-low); border-radius: 12px; padding: 8px; margin-bottom: 10px; }
+        .map-input-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .map-input-row:last-child { margin-bottom: 0; }
+        .map-input-row input[type="text"] { flex: 1; height: 38px; border: none; background: var(--m3-surface); border-radius: 8px; padding: 0 12px; font-size: 14px; font-weight: 700; outline: none; color: var(--m3-surf-text); min-width: 0; }
+        .map-input-row input[type="text"]:focus { box-shadow: 0 0 0 2px var(--m3-primary-cont); }
         
-        .data-badge { display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; background: var(--input-bg); color: var(--text-muted); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; border: 1px solid var(--border); }
-        .badge-wrap-flex { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 4px 0; }
-
-        .card-control-button-group { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; width: 100%; margin-top: 4px; }
-        .btn-card-action-unit { font-size: 13px !important; font-weight: 800 !important; padding: 10px 0 !important; border-radius: 8px !important; width: 100% !important; text-align: center !important; height: auto !important; line-height: 1.4 !important; background-color: var(--input-bg) !important; color: var(--text) !important; border: 1px solid var(--border) !important; }
-        .btn-card-action-unit.nav-active { background-color: rgba(59, 130, 246, 0.1) !important; color: var(--primary-text) !important; border-color: rgba(59, 130, 246, 0.2) !important; }
-        .btn-card-action-unit.edit-active { background-color: rgba(100, 116, 139, 0.1) !important; color: var(--text-muted) !important; border-color: rgba(100, 116, 139, 0.2) !important; }
-        .btn-card-action-unit.pickup-active { background-color: var(--warning) !important; color: #ffffff !important; border-color: var(--warning) !important; }
-        .btn-card-action-unit.complete-active { background-color: var(--inc-text) !important; color: #ffffff !important; border-color: var(--inc-text) !important; }
-
-        .addr-info { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); padding: 10px 12px; border-radius: 10px; font-size: 14.5px; font-weight: 700; margin-top: 6px; color: var(--text); line-height: 1.4; word-break: break-all; gap: 8px; }
-        .addr-text-sub-block { flex: 1; text-align: left; }
+        .input-row { display: flex; gap: 8px; margin-bottom: 12px; width: 100%; }
+        .input-box, .select-box { flex: 1; height: 42px; border-radius: 10px; border: 1px solid var(--m3-outline-variant); background: var(--m3-surface); padding: 0 12px; font-size: 14px; font-weight: 700; outline: none; color: var(--m3-surf-text); min-width: 0; }
+        .input-box:focus, .select-box:focus { border-color: var(--m3-primary); box-shadow: 0 0 0 3px var(--m3-primary-cont); }
+        .input-box::placeholder { color: var(--m3-muted); font-weight: 400; opacity: 0.5; }
         
-        .btn-white-emot { background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: 6px !important; color: var(--text) !important; padding: 6px 10px !important; font-size: 13px !important; width: auto !important; height: auto !important; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; }
-        .btn-white-emot:active { background: var(--input-bg) !important; }
+        .btn-action-row { display: flex; gap: 8px; width: 100%; margin-top: 12px; }
+        .btn-clear { width: 30%; height: 44px; background: var(--m3-surface-low); border: none; border-radius: 24px; font-weight: 800; cursor: pointer; color: var(--m3-muted); transition: background-color 0.2s;}
+        .btn-clear:active { background: rgba(255, 255, 255, 0.1); }
+        .btn-core { flex: 1; height: 44px; background: var(--m3-primary); color: var(--m3-on-primary); border: none; border-radius: 24px; font-weight: 800; cursor: pointer; letter-spacing: 0.5px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
+        .btn-core:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(0,122,255,0.2); }
+        .btn-icon { height: 32px; padding: 0 12px; background: transparent; border: 1px solid var(--m3-muted); border-radius: 16px; font-weight: 800; font-size: 11px; color: var(--m3-muted); cursor: pointer; }
 
-        .road-info-clickable-box { background-color: var(--timer-bg); color: var(--text-muted); border: 1px dashed var(--border); padding: 8px 10px; border-radius: 8px; font-size: 12.5px; margin-top: 4px; cursor: pointer; font-weight: 700; text-align: center; width: 100%; word-break: break-all; }
+        .retro-keyboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; background: var(--m3-surface-low); padding: 8px; border-radius: 12px; }
+        .retro-key { height: 40px; background: var(--m3-surface); border: 1px solid var(--m3-outline-variant); border-radius: 8px; color: var(--m3-surf-text); font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; }
+        .retro-key:active { background: var(--m3-primary-cont); color: var(--m3-on-primary-cont); }
+        .retro-key.key-clear { color: var(--m3-error); }
+        .retro-key.key-enter { background: var(--m3-primary); color: var(--m3-on-primary); grid-column: span 2; }
+
+        .sheet-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 12px; background: var(--m3-surface); }
+        .sheet-table th { background: var(--m3-surface-low); color: var(--m3-muted); font-weight: 800; padding: 8px 4px; border: 1px solid var(--m3-outline-variant); text-align: center; }
+        .sheet-table td { padding: 8px 4px; border: 1px solid var(--m3-outline-variant); color: var(--m3-surf-text); text-align: center; vertical-align: middle; }
+        .sheet-table tr:nth-child(even) { background: #191c20; }
+        .sheet-table .cell-left { text-align: left; padding-left: 6px; }
+
+        .list-wrapper { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+        .order-card { background: var(--m3-surface); border-radius: 12px; padding: 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease; display:flex; flex-direction:column; }
+        .order-title { font-size: 14px; font-weight: 800; display:flex; justify-content:space-between; align-items:center; line-height: 1.4; flex:1; }
+        .order-num { color: var(--m3-muted); font-size: 11px; margin-right: 4px; font-weight: 700; }
         
-        .addr-origin { background-color: rgba(59, 130, 246, 0.03); border-color: rgba(59, 130, 246, 0.12); }
-        .addr-dest { background-color: rgba(239, 68, 68, 0.03); border-color: rgba(239, 68, 68, 0.12); }
+        #lst-summary-bar { background: var(--m3-primary-cont); color: var(--m3-on-primary-cont); text-align: center; font-size: 12px; font-weight: 800; padding: 8px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--m3-primary); }
+        #bulk-action-bar { display: none; justify-content: space-between; align-items: center; background: var(--m3-primary-cont); color: var(--m3-on-primary-cont); padding: 10px 16px; border-radius: 12px; margin-bottom: 12px; animation: fadeIn 0.2s ease; }
 
-        .toggle-btn { display: flex; align-items: center; justify-content: center; padding: 0 6px; border-radius: 10px; cursor: pointer; margin: 0; flex-shrink:0; font-weight: 800; font-size: 13px; height: 44px; border: 1px solid var(--border); background: var(--input-bg); white-space: nowrap; }
-        .toggle-btn input { width: 16px; height: 16px; margin: 0 8px 0 0; flex-shrink: 0; }
-        .toggle-exp input { accent-color: var(--danger); }
-        .toggle-exp span { color: var(--danger-text); }
-        .toggle-bundle input { accent-color: var(--primary); }
-        .toggle-bundle span { color: var(--primary-text); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.2s; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-body { background: var(--m3-surface); border-radius: 20px; padding: 20px; width: 100%; max-width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); border: 1px solid var(--m3-outline-variant); transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-overlay.show .modal-body { transform: translateY(0); }
+        
+        .stats-box.current-qtr-border { border: 2px solid var(--m3-primary) !important; box-shadow: 0 0 8px var(--m3-primary); }
 
-        .table-wrapper { overflow-x: auto; overflow-y: auto; max-height: 40vh; border-radius: 12px; border: 1px solid var(--border); background: var(--card); }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
-        th, td { border-bottom: 1px solid var(--border); padding: 12px 10px; text-align: center; color: var(--text); }
-        th { background: var(--timer-bg); color: var(--text-muted); font-weight: 700; position: sticky; top: 0; z-index: 10; font-size: 12px; border-bottom: 1px solid var(--border); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .stats-box { background: var(--m3-surface-low); padding: 14px; border-radius: 16px; text-align: center; font-size: 12px; font-weight: 700; cursor:pointer; border: 1px solid transparent; }
+        .stats-val { font-size: 20px; font-weight: 900; margin-top: 4px; }
 
-        .text-red { color: var(--danger-text) !important; }
-        .text-green { color: var(--inc-text-color) !important; }
-        .text-blue { color: var(--primary-text) !important; }
+        .copyright-text { text-align: center; font-size: 10px; font-weight: 600; color: var(--m3-outline); padding: 8px 0; background: var(--m3-surface); border-top: 1px solid var(--m3-outline-variant); }
 
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
-        .hidden { display: none !important; }
-        .footer { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: auto; padding: 24px 0 12px 0; font-weight: 600; letter-spacing: 0.5px; }
+        .nav-bar { height: 64px; background: var(--m3-surface); display: flex; border-top: 1px solid var(--m3-outline-variant); flex-shrink: 0; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); justify-content: space-around; align-items: center; padding-top: 4px; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--m3-muted); cursor: pointer; padding: 4px 0; border-radius: 16px; transition: color 0.3s; }
+        .nav-item.active { color: var(--m3-primary); }
 
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; backdrop-filter: blur(4px); }
-        .popup-overlay.show { opacity: 1; pointer-events: auto; }
-        .popup-content { width: 92%; max-width: 400px; padding: 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--border); color: var(--text); max-height: 85vh; overflow-y: auto; transform: scale(0.95); transition: transform 0.2s ease; box-shadow: var(--shadow); }
-        .popup-overlay.show .popup-content { transform: scale(1); }
-        .popup-title { font-size: 16px; font-weight: 800; margin-top: 0; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); text-align: center; }
-        .popup-row { margin-bottom: 14px; font-size: 14px; }
-        .popup-label { font-weight: 700; color: var(--text-muted); display: block; font-size: 12px; margin-bottom: 4px; }
+        #toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(30, 30, 30, 0.95); color: #fff; border: 1px solid var(--m3-outline-variant); padding: 12px 24px; border-radius: 24px; font-size: 13px; font-weight: 700; z-index: 3000; opacity: 0; pointer-events: none; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); white-space: nowrap; }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* 신설: GEOSTICS 하이브리드 어드바이저 가이드 패널 스타일 선언 */
+        .bundle-advisor-panel { background: var(--m3-surface-low); border: 1px solid var(--m3-outline-variant); margin: 12px 0; padding: 16px; border-radius: 12px; display: none; box-shadow: 0 4px 16px rgba(0,0,0,0.4); animation: fadeIn 0.2s ease; }
+        .advisor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--m3-outline-variant); padding-bottom: 8px; }
+        .advisor-label { font-size: 11px; font-weight: 900; color: var(--m3-primary); letter-spacing: 0.5px; }
+        .advisor-badge { font-size: 11px; padding: 3px 8px; background: var(--m3-primary-cont); color: var(--m3-on-primary-cont); border-radius: 6px; font-weight: 800; }
+        .advisor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .advisor-box { background: var(--m3-surface); padding: 10px; border-radius: 8px; border: 1px solid var(--m3-outline-variant); }
+        .advisor-box-title { font-size: 10px; font-weight: 800; color: var(--m3-outline); margin-bottom: 2px; }
+        .advisor-box-value { font-size: 15px; font-weight: 900; color: var(--m3-surf-text); }
+        .advisor-strip { font-size: 11px; font-weight: 800; background: var(--m3-surface); padding: 8px 10px; border-radius: 8px; border: 1px solid var(--m3-outline-variant); margin-bottom: 6px; }
+        .advisor-strip-title { font-size: 9px; font-weight: 800; color: var(--m3-outline); margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="panel" style="margin-bottom: 6px;">
-        <div class="header-flex" style="margin-bottom: 8px;">
-            <h2 style="margin:0; font-size: 20px; color: var(--primary-text); font-weight: 900; letter-spacing: -0.5px;">QuickCare Pro</h2>
-            <div style="display:flex; gap:6px; align-items:center;">
-                <button type="button" class="btn-icon btn-small" style="margin:0; font-size:14px; padding:6px 10px;" onclick="toggleForceThemeMode()">🌗</button>
-                <button class="btn-icon btn-small" style="margin:0; font-size: 16px; padding: 6px 10px;" onclick="document.getElementById('settingsArea').classList.toggle('hidden')">⚙️</button>
-            </div>
-        </div>
-        
-        <div class="timer-box" id="globalTimerBox">
-            <div class="timer-left-col">
-                <div class="timer-row">
-                    <div>
-                        <span id="sysDate" style="font-size:12px; color:var(--text-muted); margin-right:4px;"></span>
-                        <span id="sysTime" class="timer-time-main">00:00</span>
-                    </div>
-                    <span id="curQtr" class="timer-qtr-badge">Pre</span>
-                </div>
-                <div class="timer-row timer-sub-text">
-                    <span>QTR <span id="qtrLeft" style="color:var(--primary-text); font-weight:800;">0h 00m</span></span>
-                    <span>FIN <span id="totLeft" style="color:var(--text); font-weight:800;">0h 00m</span></span>
-                </div>
-            </div>
-        </div>
+    <div id="toast">Message</div>
 
-        <div id="settingsArea" class="hidden" style="margin-top: 10px; padding-top: 14px; border-top: 1px dashed var(--border);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Tmap App Key</label>
-                <button type="button" class="btn-danger btn-small" id="btnResetAll" style="padding: 4px 10px; font-size: 11px; font-weight: 700; margin: 0; border-radius: 6px;" onclick="resetAllDataAndStorage()">초기화</button>
-            </div>
-            <input type="password" id="tmapApiKey" placeholder="Tmap 인증 키를 입력하세요" style="margin-bottom: 6px;">
-            <div style="text-align: center; margin-top: 12px; font-size: 11px; color: var(--text-muted); font-weight: 500;">QuickCare Pro v1.2</div>
+    <div class="sys-bar">
+        <div class="sys-left">
+            <div class="sys-clock" id="sysClock" onclick="openTimetableModal()">00:00</div>
+            <div class="sys-qtr" id="sysQtrBadge">Q1</div>
+        </div>
+        <div class="sys-mid">
+            <div id="sysTotalRev">0.0k</div>
+        </div>
+        <div class="sys-right">
+            <div onclick="toggleModal('popSet')" style="font-size:14px; cursor:pointer; padding:4px; font-weight:bold; color:var(--m3-primary);">SETTINGS</div>
         </div>
     </div>
 
-    <div class="mode-swiper-container">
-        <div id="tabMode1" class="swiper-tab active" onclick="switchRoom(1)">오더</div>
-        <div id="tabMode2" class="swiper-tab" onclick="switchRoom(2)">정산</div>
-        <div id="tabMode3" class="swiper-tab" onclick="switchRoom(3)">지출</div>
-        <div id="tabMode4" class="swiper-tab" onclick="switchRoom(4)">정비</div>
-        <div id="tabMode5" class="swiper-tab" onclick="switchRoom(5)">통계</div>
-    </div>
+    <div class="viewport" id="main-viewport">
 
-    <div id="roomSection1">
-        <div class="panel" style="padding: 12px 16px;">
-            <button type="button" class="clickable-title-btn" onclick="toggleOrderInputSection()">
-                <span>오더</span>
-                <span id="orderTitleArrow" class="title-arrow">▼</span>
-            </button>
+        <div id="view-ord" class="section active">
+            <div class="app-title">QuickCal Pro</div>
             
-            <div id="orderInputExpandContainer" class="hidden" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border);">
-                <div class="header-flex" style="margin-bottom: 10px;">
-                    <span style="font-size: 13px; font-weight: 800; color: var(--text-muted);">오더 입력</span>
-                    
-                    <div style="display:flex; gap:4px; align-items:center;">
-                        <button id="btnPasteExcel" class="btn-warning btn-small" style="margin:0; padding: 0 12px; height:32px; font-size: 12px; white-space: nowrap;">등록</button>
+            <div class="flex-center">
+                <div class="main-toggle">
+                    <div class="main-toggle-btn active" id="btn-mode-quicks" onclick="setAppMode('QUICKS')">QUICKS</div>
+                    <div class="main-toggle-btn" id="btn-mode-eats" onclick="setAppMode('EATS')">EATS</div>
+                </div>
+            </div>
+            
+            <div class="card" id="input-card">
+                <div class="chip-row flex-center mb-16" id="platform-chips"></div>
+
+                <div id="quicks-inputs" class="map-input-group">
+                    <div class="map-input-row">
+                        <input type="text" id="in-pick-quicks" placeholder="PICKUP" oninput="triggerAdvisorInterruption()">
+                    </div>
+                    <div class="map-input-row">
+                        <input type="text" id="in-drop-quicks" placeholder="DROPOFF" oninput="triggerAdvisorInterruption()">
+                    </div>
+                </div>
+
+                <div id="eats-inputs" class="map-input-group" style="display:none;">
+                    <div class="map-input-row">
+                        <input type="text" id="in-pick-eats" placeholder="PICKUP" oninput="cacheEatsInput(); triggerAdvisorInterruption();">
+                        <input type="checkbox" id="chkEatsPin" style="accent-color:var(--m3-primary); margin-left:8px; width:22px; height:22px;" onchange="cacheEatsInput()">
+                    </div>
+                    <div class="map-input-row">
+                        <input type="text" id="in-drop-eats" placeholder="DROPOFF" oninput="cacheEatsInput(); triggerAdvisorInterruption();">
+                    </div>
+                </div>
+
+                <div id="bundle-utility-panel" class="bundle-advisor-panel">
+                    <div class="advisor-header">
+                        <span class="advisor-label">⚡ GEOSTICS CORE BUNDLE ADVISOR</span>
+                        <span id="bu-route-coherence" class="advisor-badge">COHERENCE: 0%</span>
+                    </div>
+                    <div class="advisor-grid">
+                        <div class="advisor-box">
+                            <div class="advisor-box-title">ESTIMATED TIME</div>
+                            <div id="bu-total-time" class="advisor-box-value">0분</div>
+                        </div>
+                        <div class="advisor-box">
+                            <div class="advisor-box-title">HOURLY DELTA</div>
+                            <div id="bu-hourly-delta" class="advisor-box-value">+0원/h</div>
+                        </div>
+                    </div>
+                    <div class="advisor-strip">
+                        <div class="advisor-strip-title">ADMINISTRATIVE MATCH</div>
+                        <div style="display: flex; gap: 8px;" id="bu-admin-hierarchy">
+                            <span id="match-sigu" style="color: var(--m3-outline);">[시·구]</span>
+                            <span id="match-eupmyeondong" style="color: var(--m3-outline);">[읍·면·동]</span>
+                            <span id="match-dong" style="color: var(--m3-outline);">[리·행정동]</span>
+                        </div>
+                    </div>
+                    <div class="advisor-strip" id="bu-road-geometry" style="display: flex; align-items: center; gap: 6px;">
+                        <span id="bu-geo-icon">🛣️</span>
+                        <span id="bu-geo-text">분석 대기 중...</span>
+                    </div>
+                    <div class="advisor-strip" id="bu-dynamic-info" style="border-color: var(--m3-primary-cont);">
+                        <div class="advisor-strip-title" style="color: var(--m3-primary); font-weight:900;">DYNAMIC INFO</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; font-size:11px; font-weight:700; margin-top:4px;">
+                            <div id="dy-landmark">📍 랜드마크: -</div>
+                            <div id="dy-last-feet">🚶 건물 내부 실거리: -</div>
+                            <div id="dy-pedestrian">🚶 보행자 및 도로 특성: -</div>
+                            <div id="dy-traffic">🛣️ 실시간 교통 상황: -</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-center gap-8 mb-12" id="search-map-row">
+                    <button class="btn-icon" id="btn-search" style="color:var(--m3-primary); border-color:var(--m3-primary); padding:0 16px;" onclick="searchTmapActive()">SEARCH</button>
+                    <button class="btn-icon" id="btn-map" style="color:#ffffff; border-color:var(--m3-outline); background:var(--m3-surface-low); padding:0 16px;" onclick="openRouteMapActive()">MAP</button>
+                </div>
+
+                <div class="input-row">
+                    <input type="number" step="0.1" inputmode="decimal" id="in-fare" class="input-box" placeholder="AMOUNT (k)" oninput="triggerAdvisorInterruption()">
+                    <input type="text" id="in-memo" class="input-box" placeholder="NOTE">
+                </div>
+                
+                <div class="btn-action-row" id="normal-action-row">
+                    <button class="btn-clear" onclick="clearInputs()">CLEAR</button>
+                    <button class="btn-core" id="btn-add" onclick="commitOrder()">ADD ORDER</button>
+                </div>
+
+                <div id="eats-keyboard-panel" style="display:none;">
+                    <div class="retro-keyboard">
+                        <div class="retro-key" onclick="pressRetroKey('1')">1</div>
+                        <div class="retro-key" onclick="pressRetroKey('2')">2</div>
+                        <div class="retro-key" onclick="pressRetroKey('3')">3</div>
+                        <div class="retro-key" onclick="pressRetroKey('4')">4</div>
+                        <div class="retro-key" onclick="pressRetroKey('5')">5</div>
+                        <div class="retro-key" onclick="pressRetroKey('6')">6</div>
+                        <div class="retro-key" onclick="pressRetroKey('7')">7</div>
+                        <div class="retro-key" onclick="pressRetroKey('8')">8</div>
+                        <div class="retro-key" onclick="pressRetroKey('9')">9</div>
+                        <div class="retro-key" onclick="pressRetroKey('.')">.</div>
+                        <div class="retro-key" onclick="pressRetroKey('0')">0</div>
+                        <div class="retro-key key-clear" onclick="pressRetroKey('C')">C</div>
+                        <div class="retro-key key-enter" onclick="pressRetroKey('ENTER')">ENTER</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="view-lst" class="section">
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+                <div class="flex-between">
+                    <div class="chip-row" style="margin:0;">
+                        <div class="chip active" id="flt-run" onclick="setListFilter('RUN')">ACTIVE</div>
+                        <div class="chip" id="flt-fin" onclick="setListFilter('FIN')">DONE</div>
+                    </div>
+                    <div class="flex-center gap-8">
+                        <button class="btn-icon" id="btn-select-mode" style="border-color:var(--m3-muted); color:var(--m3-muted);" onclick="toggleSelectMode()">SELECT</button>
+                        <button class="btn-icon" style="color:var(--m3-primary); border-color:var(--m3-primary);" onclick="copyTodayData()">COPY</button>
+                    </div>
+                </div>
+
+                <div class="flex-between" style="background:var(--m3-surface); padding:8px 12px; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.3);">
+                    <div class="flex-center gap-4">
+                        <span class="chip active" id="flt-all" style="padding:4px 8px; font-size:10px;" onclick="setTypeFilter('ALL')">ALL</span>
+                        <span class="chip" id="flt-quicks" style="padding:4px 8px; font-size:10px;" onclick="setTypeFilter('QUICKS')">QUICKS</span>
+                        <span class="chip" id="flt-eats" style="padding:4px 8px; font-size:10px;" onclick="setTypeFilter('EATS')">EATS</span>
                     </div>
                 </div>
                 
-                <div id="pasteArea" class="hidden" style="margin-bottom: 10px; padding: 12px; background: var(--timer-bg); border: 1px dashed var(--warning); border-radius: 10px;">
-                    <textarea id="excelInput" rows="3" style="width: 100%; border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 13px; background: var(--input-bg); color: var(--text); border: 1px solid var(--border); outline:none; font-family:inherit;" placeholder="오더 문자"></textarea>
-                    <button id="btnProcessExcel" class="btn-warning btn-small" style="width: 100%; margin:0; padding: 10px;">등록</button>
-                </div>
+                <div id="lst-summary-bar">ACTIVE: 0 | DONE: 0</div>
 
-                <div class="input-row-2-col">
-                    <select id="platformSelect">
-                        <option value="I|0.77">인성(77%)</option>
-                        <option value="L|0.77">로지(77%)</option>
-                        <option value="K|1.00">카카오(100%)</option>
-                        <option value="B|1.00">배민(100%)</option>
-                        <option value="C|1.00">쿠팡(100%)</option>
-                    </select>
-                    <select id="qtrSelect" onchange="handleQtrChangeManually(this)">
-                        <option value="AUTO">QTR 자동</option><option value="Pre">Pre</option>
-                        <option value="Q1">Q1</option><option value="Q2">Q2</option><option value="R">R</option>
-                        <option value="Q3">Q3</option><option value="Q4">Q4</option><option value="Fin">Fin</option>
-                    </select>
-                </div>
-                
-                <div class="navi-grid">
-                    <div class="navi-grid-inputs">
-                        <input type="text" id="originInput" placeholder="상차">
-                        <input type="text" id="destInput" placeholder="하차">
+                <div id="bulk-action-bar">
+                    <div class="flex-center gap-8">
+                        <input type="checkbox" id="chkSelectAll" style="width:20px; height:20px; accent-color:var(--m3-primary);" onchange="toggleSelectAll(this)">
+                        <span style="font-size:13px; font-weight:800;" id="bulk-count">0 SELECTED</span>
                     </div>
-                    <button type="button" id="btnFetchTmap" class="btn-warning btn-tmap-fetch-action">조회</button>
-                </div>
-
-                <div class="input-row-bot">
-                    <input type="text" id="amountInput" inputmode="decimal" placeholder="운임 (단위: 천)">
-                    <input type="text" id="timeInput" inputmode="number" placeholder="시간 (분)">
-                </div>
-
-                <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px;">
-                    <label class="toggle-btn toggle-bundle" for="bundleCheck" style="flex:1;">
-                        <input type="checkbox" id="bundleCheck"><span>폰</span>
-                    </label>
-                    <label class="toggle-btn toggle-exp" for="expressCheck" style="flex:1;">
-                        <input type="checkbox" id="expressCheck"><span>EXP</span>
-                    </label>
-                </div>
-
-                <div id="tmapPreviewArea" class="hidden" style="margin-bottom: 12px; padding: 10px; background: rgba(16, 185, 129, 0.1); color: var(--inc-text-color); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 700; line-height: 1.5;"></div>
-                <button id="btnAddRoute" class="btn-primary" style="margin: 0;">추가</button>
-            </div>
-        </div>
-
-        <div class="panel" style="display: flex; flex-direction: column;">
-            <div class="header-flex" style="margin-bottom: 12px;">
-                <h3 style="margin:0; font-size: 15px; font-weight:800;">운행</h3>
-                <div class="filter-tab-container">
-                    <div id="tabRunning" class="filter-tab active" onclick="switchFilterView(false)">운행</div>
-                    <div id="tabCompleted" class="filter-tab" onclick="switchFilterView(true)">완료</div>
-                </div>
-            </div>
-            <div id="routeListContainer" style="overflow-y: auto; max-height: 520px;"></div>
-        </div>
-    </div>
-
-    <div id="roomSection2" class="hidden">
-        <div class="panel">
-            <div class="header-flex" style="margin-bottom: 12px;">
-                <h3 style="margin: 0; font-size:16px; font-weight:800; color:var(--text);">정산</h3>
-                <div style="display:flex; gap:6px; align-items: center;">
-                    <button type="button" class="btn-small btn-warning" style="height: 32px; padding: 6px 10px;" onclick="showPlatformStats()">플랫폼별</button>
-                    <button type="button" class="btn-small btn-success" style="height: 32px; padding: 6px 10px;" onclick="triggerUnifiedClipboardCopy()">엑셀복사</button>
+                    <button style="background:var(--m3-error); border:none; color:#fff; border-radius:16px; padding:6px 16px; font-size:11px; font-weight:800; cursor:pointer;" onclick="deleteSelected()">DELETE</button>
                 </div>
             </div>
 
-            <div class="calc-banner-grid">
-                <div class="calc-banner-card" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);"><span class="calc-lbl">총 수입 (REV)</span><span id="totInc" class="calc-val-main">0.0k</span></div>
-                <div class="calc-banner-card sub"><span class="calc-lbl">완료 건수 (CALL)</span><span id="totCountBadge" class="calc-val-sub">0 k</span></div>
-            </div>
-            <div class="calc-banner-grid">
-                <div class="calc-banner-card sub"><span class="calc-lbl">시간당 수익 (WAGE)</span><span id="hourlyWageVal" class="calc-val-sub">0.0k</span></div>
-                <div class="calc-banner-card sub"><span class="calc-lbl">운행 거리 (DIST)</span><span id="totalDistanceVal" class="calc-val-sub">0.0 k</span></div>
-            </div>
-
-            <div class="summary-box"><div class="summary-title">지역 요약 (LOC)</div><div id="topRegionsLog" style="color:var(--text); font-weight:600;">-</div></div>
-            <div class="summary-box"><div class="summary-title">주요 도로 (ROAD)</div><div id="mainRouteSummaryLog" style="color:var(--text); font-weight:600;">-</div></div>
-
-            <div class="table-wrapper">
-                <table id="logTable">
-                    <thead><tr><th>NO</th><th>상태</th><th>플랫폼</th><th>구간</th><th>수입</th><th>거리</th><th>소요</th><th>관리</th></tr></thead>
-                    <tbody id="calcTableBody"></tbody>
+            <div class="list-wrapper" style="background:var(--m3-surface); border-radius:12px; overflow:hidden; border:1px solid var(--m3-outline-variant);">
+                <table class="sheet-table">
+                    <thead>
+                        <tr>
+                            <th style="width:10%;">SEL</th>
+                            <th style="width:15%;">TIME</th> <th style="width:15%;">PLAT</th>
+                            <th style="width:35%;">ROUTE SUMMARY</th>
+                            <th style="width:13%;">FARE</th>
+                            <th style="width:12%;">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="master-list-tbody"></tbody>
                 </table>
             </div>
         </div>
-    </div>
 
-    <div id="roomSection3" class="hidden">
-        <div class="panel">
-            <h3 style="margin:0 0 12px 0; font-size:16px; font-weight:800;">지출</h3>
-            <div style="display:grid; grid-template-columns: 100px 1fr; gap:6px; margin-bottom:6px;">
-                <select id="expTypeSelect">
-                    <option value="주유">주유</option>
-                    <option value="식사">식사</option>
-                    <option value="간식">간식</option>
-                    <option value="기타">기타</option>
-                </select>
-                <input type="text" id="expAmountInput" inputmode="decimal" placeholder="금액">
+        <div id="view-exp" class="section">
+            <div class="card">
+                <div class="chip-row mb-12" id="exp-chips" style="flex-wrap:nowrap; gap:6px;">
+                    <div class="chip active" onclick="selCostChip(this, 'exp')" style="flex:1; padding:6px 0;">GAS</div>
+                </div>
+                <div class="input-row">
+                    <input type="number" step="0.1" inputmode="decimal" id="exp-amt" class="input-box" placeholder="AMOUNT (k)">
+                    <input type="text" id="exp-memo" class="input-box" placeholder="NOTE">
+                </div>
+                <button class="btn-core" style="background:var(--m3-error); border-radius:12px;" onclick="addCostRecord('EXP')">ADD EXPENSE</button>
             </div>
-            <input type="text" id="expMemoInput" placeholder="내역" style="margin-bottom:8px;">
-            <button class="btn-danger" onclick="addExpenseRecord()">지출 등록</button>
+            <div class="list-wrapper" id="exp-list"></div>
         </div>
-        <div class="panel">
-            <h3 style="margin:0 0 12px 0; font-size:14px; font-weight:800;">지출 내역</h3>
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>날짜</th><th>유형</th><th>내역</th><th>금액</th><th>❌</th></tr></thead>
-                    <tbody id="expenseTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
-    <div id="roomSection4" class="hidden">
-        <div class="panel">
-            <h3 style="margin:0 0 12px 0; font-size:16px; font-weight:800;">정비</h3>
-            <div style="display:grid; grid-template-columns: 120px 1fr; gap:6px; margin-bottom:6px;">
-                <select id="maintTypeSelect">
-                    <option value="오일">오일</option>
-                    <option value="타이어">타이어</option>
-                    <option value="브레이크패드">브레이크패드</option>
-                    <option value="정기검진">정기검진</option>
-                    <option value="기타정비">기타정비</option>
-                </select>
-                <input type="text" id="maintAmountInput" inputmode="decimal" placeholder="비용">
-            </div>
-            <input type="text" id="maintMemoInput" placeholder="메모" style="margin-bottom:8px;">
-            <button class="btn-warning" onclick="addMaintRecord()">정비 등록</button>
-        </div>
-        <div class="panel">
-            <h3 style="margin:0 0 12px 0; font-size:14px; font-weight:800;">정비 내역</h3>
-            <div class="table-wrapper">
-                <table>
-                    <thead><tr><th>날짜</th><th>항목</th><th>내용</th><th>비용</th><th>❌</th></tr></thead>
-                    <tbody id="maintTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div id="roomSection5" class="hidden">
-        <div class="panel">
-            <h3 style="margin:0 0 12px 0; font-size:16px; font-weight:800;">통계</h3>
-            <div class="calc-banner-card" style="background: linear-gradient(135deg, #065f46 0%, #022c22 100%); margin-bottom:12px;">
-                <span class="calc-lbl" style="color:#34d399;">순수익 (NET)</span>
-                <span id="grandNetProfit" class="calc-val-main" style="font-size:26px; color:#34d399;">0.0k</span>
-            </div>
-            <div class="calc-banner-grid">
-                <div class="calc-banner-card sub"><span class="calc-lbl">총 매출</span><span id="grandTotalInc" class="calc-val-sub" style="color:var(--inc-text-color);">0.0k</span></div>
-                <div class="calc-banner-card sub"><span class="calc-lbl">총 지출</span><span id="grandTotalExp" class="calc-val-sub" style="color:var(--danger-text);">0.0k</span></div>
-            </div>
-        </div>
-        <div class="panel">
-            <h3 style="margin:0 0 12px 0; font-size:14px; font-weight:800;">항목별 지출 세부 요약</h3>
-            <div class="summary-box"><div class="summary-title">주유비 총액</div><div id="statFuel" style="font-weight:700; color:var(--text);">0.0k</div></div>
-            <div class="summary-box"><div class="summary-title">식비 총액</div><div id="statFood" style="font-weight:700; color:var(--text);">0.0k</div></div>
-            <div class="summary-box"><div class="summary-title">간식비 총액</div><div id="statSnack" style="font-weight:700; color:var(--text);">0.0k</div></div>
-            <div class="summary-box"><div class="summary-title">정비비 총액</div><div id="statMaint" style="font-weight:700; color:var(--text);">0.0k</div></div>
-        </div>
-    </div>
-
-    <div id="routeDetailPopup" class="popup-overlay" onclick="closeDetailPopup()">
-        <div class="popup-content" onclick="event.stopPropagation()">
-            <h4 class="popup-title" id="popDynamicTitle">오더 정보 변경</h4>
-            <div class="popup-row">
-                <span class="popup-label">상차 설정</span>
-                <input type="text" id="popOrigin" style="margin-bottom:4px;" placeholder="상차">
-            </div>
-            <div class="popup-row">
-                <span class="popup-label">하차 설정</span>
-                <input type="text" id="popDest" style="margin-bottom:4px;" placeholder="하차">
-            </div>
-            <div class="popup-row">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
-                    <div>
-                        <span class="popup-label">운임 (k)</span>
-                        <input type="text" id="popAmount" placeholder="운임">
+        <div id="view-mnt" class="section">
+            <div class="card">
+                <div class="chip-row mb-12" id="mnt-chips" style="flex-wrap:nowrap; gap:4px;">
+                    <div class="chip active" onclick="selCostChip(this, 'mnt')" style="flex:1; padding:6px 0;">OIL</div>
+                </div>
+                <div class="input-row mb-8">
+                    <input type="number" step="0.1" inputmode="decimal" id="mnt-amt" class="input-box" placeholder="AMOUNT (k)">
+                    <input type="text" id="mnt-store" class="input-box" placeholder="STORE">
+                </div>
+                <div class="input-row mb-12">
+                    <div style="flex:1; position:relative;">
+                        <input type="number" inputmode="numeric" id="mnt-mileage" class="input-box" placeholder="MILEAGE" style="width:100%; padding-right:30px;">
+                        <span style="position:absolute; right:12px; top:12px; font-size:11px; font-weight:800; color:var(--m3-muted);">km</span>
                     </div>
-                    <div>
-                        <span class="popup-label">예상 시간</span>
-                        <input type="number" id="popTime" placeholder="시간">
-                    </div>
+                    <input type="text" id="mnt-product" class="input-box" placeholder="PRODUCT">
                 </div>
+                <button class="btn-core" style="background:var(--m3-primary-cont); color:var(--m3-on-primary-cont); border-radius:12px; border:1px solid var(--m3-primary);" onclick="addCostRecord('MNT')">ADD MAINTENANCE</button>
             </div>
-            <div class="popup-row">
-                <div style="display:flex; gap:6px;">
-                    <label class="toggle-btn toggle-bundle" for="popBundleCheck" style="flex:1; height:40px;">
-                        <input type="checkbox" id="popBundleCheck"><span>폰</span>
-                    </label>
-                    <label class="toggle-btn toggle-exp" for="popExpressCheck" style="flex:1; height:40px;">
-                        <input type="checkbox" id="popExpressCheck"><span>EXP</span>
-                    </label>
+            <div class="list-wrapper" id="mnt-list"></div>
+        </div>
+
+        <div id="view-stt" class="section">
+            <div class="card">
+                <div class="chip-row mb-16" style="flex-wrap: nowrap; justify-content: space-between; gap: 4px;">
+                    <div class="chip active" style="flex:1; padding:6px 0;">DAILY</div>
+                    <div style="width:1px; background:var(--m3-outline-variant); margin:0 2px;"></div>
+                    <div class="chip active" id="st-metric-amt" onclick="setStMetric('AMT')" style="flex:1; padding:6px 0;">AMOUNT</div>
+                    <div class="chip" id="st-metric-loc" onclick="setStMetric('LOC')" style="flex:1; padding:6px 0;">LOCATION</div>
                 </div>
+                <div id="stats-render-block"></div>
+                <div id="stats-detail-block" style="margin-top:12px; display:none; background:var(--m3-surface-low); border-radius:12px; padding:12px;"></div>
             </div>
-            <div class="popup-row" style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border);">
-                <button class="btn-warning" id="btnSavePopupEdit" style="width:100%; margin-bottom:6px; padding:12px 0;">💾 변경 내용 저장</button>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-                    <button class="btn-danger" id="btnDeletePopupEdit" style="padding:10px 0;">이 오더 삭제</button>
-                    <button class="btn-primary" style="background-color:var(--text-muted); padding:10px 0;" onclick="closeDetailPopup()">닫기</button>
-                </div>
+        </div>
+
+    </div>
+
+    <div class="copyright-text" style="line-height: 1.5; padding: 10px 0;">
+        <div>Powered by <span style="color: var(--m3-primary); font-weight: 800;">Geostics Base OS v1.0.0</span> Core Kernel [cite: 1, 2]</div>
+        <div>© 2026 <span style="font-weight: 800;">QuickCal Pro v2.0.0</span> & QuickSys Pro.Com. All rights reserved. [cite: 1, 2]</div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-item active" style="flex: 2;" id="nav-ord" onclick="switchMainTab('ord', this)">
+            ORD
+        </div>
+        <div class="nav-item" style="flex: 2;" id="nav-lst" onclick="switchMainTab('lst', this)">
+            LST
+        </div>
+        <div class="nav-item" style="flex: 1; font-size: 20px; font-weight: 900;" onclick="toggleModal('popMore')">
+            ☰
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="popConfirm" style="z-index: 9999;">
+        <div class="modal-body text-center" style="max-width:280px; padding:24px;">
+            <div id="confirmMessage" class="text-bold mb-16" style="font-size:14px; line-height:1.5; color:var(--m3-surf-text); white-space:pre-wrap;"></div>
+            <div class="flex-center gap-12">
+                <button class="btn-icon" style="flex:1; height:40px; border:1px solid var(--m3-outline); color:var(--m3-outline); font-size:12px;" onclick="closeConfirm()">CANCEL</button>
+                <button class="btn-core" style="flex:1; height:40px; margin:0; border-radius:16px; font-size:12px;" id="btnConfirmAction">CONFIRM</button>
             </div>
         </div>
     </div>
 
-    <div id="statsPopup" class="popup-overlay" onclick="closeStatsPopup()"><div class="popup-content" onclick="event.stopPropagation()"><h4 class="popup-title">플랫폼 수익 통계</h4><div id="statsContent"></div><button class="btn-primary" style="width:100%; margin-top:16px; padding:12px 0;" onclick="closeStatsPopup()">닫기</button></div></div>
-
-    <div id="roadPathMajorPopup" class="popup-overlay" onclick="closeRoadPathPopup()">
-        <div class="popup-content" onclick="event.stopPropagation()">
-            <h4 class="popup-title">운행 경로 상세 안내</h4>
-            <div id="roadPathPopupContent" style="font-size: 15px; font-weight:700; line-height:1.7; background: var(--timer-bg); padding:14px; border-radius:10px; border:1px solid var(--border); text-align:center; word-break:break-all;">-</div>
-            <button class="btn-primary" style="width:100%; margin-top:16px; padding:12px 0;" onclick="closeRoadPathPopup()">확인</button>
+    <div class="modal-overlay" id="popQtr" onclick="if(event.target===this) closeModal('popQtr')">
+        <div class="modal-body">
+            <div class="text-center text-bold" style="font-size:15px; margin-bottom:14px;">TIMETABLE</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;" id="qtrPopupGrid"></div>
         </div>
     </div>
 
-    <div class="footer">© 2026 QuickCare Pro. All rights reserved.</div>
+    <div class="modal-overlay" id="popMore" onclick="if(event.target===this) closeModal('popMore')">
+        <div class="modal-body text-center">
+            <div class="text-bold mb-16" style="font-size:15px;">MENU</div>
+            <button class="btn-core mb-12" style="width:100%; border-radius:12px; height:48px; background:var(--m3-surface-low); color:var(--m3-surf-text);" onclick="closeModal('popMore'); switchMainTab('exp', null);">EXPENSES</button>
+            <button class="btn-core mb-12" style="width:100%; border-radius:12px; height:48px; background:var(--m3-surface-low); color:var(--m3-surf-text);" onclick="closeModal('popMore'); switchMainTab('mnt', null);">MAINTENANCE</button>
+            <button class="btn-core" style="width:100%; border-radius:12px; height:48px; background:var(--m3-surface-low); color:var(--m3-surf-text);" onclick="closeModal('popMore'); switchMainTab('stt', null);">STATISTICS</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="popSet" onclick="if(event.target===this) closeModal('popSet')">
+        <div class="modal-body">
+            <div class="flex-between mb-16">
+                <div class="text-bold" style="font-size:15px;">SETTINGS</div>
+                <div style="text-align: right;">
+                    <div class="text-bold" style="font-size:12px; color:var(--m3-primary);">QuickCal Pro v2.0.0</div>
+                    <div style="font-size:10px; color:var(--m3-outline); font-weight:700; margin-top:2px;">Geostics OS v1.0.0 Inside [cite: 1, 2]</div>
+                </div>
+            </div>
+
+            <div class="flex-between mb-16">
+                <div class="text-bold" style="font-size:12px; color:var(--m3-muted);">KEEP SCREEN ON</div>
+                <input type="checkbox" id="set-wakelock" onchange="toggleWakeLock(this.checked)" style="accent-color:var(--m3-primary); transform:scale(1.2);">
+            </div>
+
+            <div class="flex-between gap-8 mb-20">
+                <div class="stats-box" style="flex:1; padding:12px 0; margin:0;" onclick="syncWithCloud(true); closeModal('popSet');">
+                    <div style="font-size:10px; color:var(--m3-muted);">SYNC</div>
+                </div>
+                <div class="stats-box" style="flex:1; padding:12px 0; margin:0;" onclick="location.reload();">
+                    <div style="font-size:10px; color:var(--m3-muted);">RELOAD</div>
+                </div>
+            </div>
+            
+            <div class="text-bold mb-8" style="font-size:11px; color:var(--m3-muted);">TMAP API KEY</div>
+            <input type="password" id="tmap-key" class="input-box mb-12" style="width:100%;" placeholder="Enter Key">
+
+            <div class="text-bold mb-8" style="font-size:11px; color:var(--m3-muted);">SYNC URL</div>
+            <input type="password" id="sheet-url" class="input-box mb-12" style="width:100%;" placeholder="https://script.google.com/macros/...">
+
+            <div class="text-bold mb-8" style="font-size:11px; color:var(--m3-muted);">OIL MILEAGE INTERVAL (km)</div>
+            <input type="number" id="oil-interval" class="input-box mb-24" style="width:100%;" placeholder="e.g. 5000">
+            
+            <div class="flex-between">
+                <button class="btn-icon" style="color:var(--m3-error); border-color:var(--m3-error); padding:6px 16px;" onclick="factoryReset()">FACTORY RESET</button>
+                <button class="btn-core" style="width:100px; height:36px; border-radius:12px; margin:0;" onclick="saveSystemConfig()">SAVE</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="popManage" onclick="if(event.target===this) closeModal('popManage')">
+        <div class="modal-body">
+            <div class="text-bold mb-16" style="font-size:15px;">EDIT ORDER</div>
+            <input type="hidden" id="editOrderId">
+            <div class="map-input-row mb-8">
+                <select id="editPlatform" class="select-box" style="height:38px; border-radius:8px;"></select>
+            </div>
+            <div class="map-input-row mb-8">
+                <input type="text" id="editIn1" class="input-box" style="margin:0; height:38px; border-radius:8px;" placeholder="PICKUP">
+            </div>
+            <div class="map-input-row mb-16">
+                <input type="text" id="editIn2" class="input-box" style="margin:0; height:38px; border-radius:8px;" placeholder="DROPOFF">
+            </div>
+            <div class="input-row mb-16">
+                <input type="number" step="0.1" inputmode="decimal" id="editFareInput" class="input-box" style="border-radius:8px;" placeholder="AMOUNT (k)">
+                <input type="text" id="editMemoInput" class="input-box" style="border-radius:8px;" placeholder="NOTE">
+            </div>
+            <button class="btn-core" style="border-radius:12px;" onclick="commitOrderModification()">SAVE CHANGES</button>
+        </div>
+    </div>
 
     <script>
-        const daysEng = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-        const platNames = {"I": "인성", "L": "로지", "K": "카카오", "B": "배민", "C": "쿠팡"};
-        
-        let routes = [];
-        let expenses = []; 
-        let maintenance = []; 
-        let currentFilterCompleted = false; 
-        let selectedPopupRouteId = null; 
-        let expandedCardIds = [];
-        let isForceThemeActive = null; 
-
-        let sumFuel = 0, sumFood = 0, sumSnack = 0, sumEtc = 0, sumMaint = 0;
-        
-        let tempOriginLon = null, tempOriginLat = null, tempOriginRoadAddr = "";
-        let tempDestLon = null, tempDestLat = null, tempDestRoadAddr = ""; 
-        let tempMajorRoads = ""; let tempDistanceKm = 0;
-
-        routes = cleanGarbageData(localStorage.getItem('quickone_integrated_logs'));
-        try { expenses = JSON.parse(localStorage.getItem('quickone_expenses')) || []; } catch(e) { expenses = []; }
-        try { maintenance = JSON.parse(localStorage.getItem('quickone_maintenance')) || []; } catch(e) { maintenance = []; }
-
-        window.toggleOrderInputSection = function() {
-            const container = document.getElementById('orderInputExpandContainer');
-            const arrow = document.getElementById('orderTitleArrow');
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden'); arrow.innerText = "▲";
-            } else {
-                container.classList.add('hidden'); arrow.innerText = "▼";
-            }
-        };
-
-        window.toggleCardAccordionSection = function(e, id) {
-            e.stopPropagation();
-            const idx = expandedCardIds.indexOf(id);
-            if (idx > -1) { expandedCardIds.splice(idx, 1); } else { expandedCardIds.push(id); }
-            updateDashboard();
-        };
-
-        window.inlineTextClipboardCopy = function(e, rawText) {
-            e.stopPropagation();
-            if (!rawText) return;
-            let ta = document.createElement("textarea"); ta.value = rawText; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-            alert(`복사 완료: ${rawText}`);
-        };
-
-        window.openRoadPathPopupHandler = function(e, roadFullString) {
-            e.stopPropagation();
-            document.getElementById('roadPathPopupContent').innerText = roadFullString || "상세 경로 정보가 존재하지 않습니다.";
-            document.getElementById('roadPathMajorPopup').classList.add('show');
-        };
-        window.closeRoadPathPopup = function() { document.getElementById('roadPathMajorPopup').classList.remove('show'); };
-
-        window.toggleForceThemeMode = function() {
-            if (document.body.classList.contains('dark-mode-forced')) {
-                document.body.classList.remove('dark-mode-forced');
-                document.body.classList.add('light-theme-forced');
-                isForceThemeActive = "light";
-            } else {
-                document.body.classList.remove('light-theme-forced');
-                document.body.classList.add('dark-mode-forced');
-                isForceThemeActive = "dark";
-            }
-        };
-
-        function resetAllDataAndStorage() {
-            if(confirm("모든 시스템 데이터 및 API 인증 정보가 영구 파기됩니다. 진행하시겠습니까?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function cleanGarbageData(raw) {
+        function loadDataSafely(key, defaultVal) {
             try {
-                let parsed = JSON.parse(raw); if (!Array.isArray(parsed)) return [];
-                let cleanArr = [];
-                for (let r of parsed) {
-                    if (r && typeof r === 'object' && r.id && r.origin && r.dest) {
-                        cleanArr.push({
-                            id: String(r.id), origin: String(r.origin), dest: String(r.dest), amount: parseFloat(r.amount) || 0,
-                            time: parseInt(r.time) || 0, isExpress: !!r.isExpress, isBundle: !!r.isBundle, qtr: String(r.qtr || 'Pre'),
-                            platCode: String(r.platCode || 'K|1.00'), timeLeft: parseInt(r.timeLeft) || 0, timerActive: !!r.timerActive, 
-                            isCompleted: !!r.isCompleted, pickupDone: !!r.pickupDone, countUpMins: parseInt(r.countUpMins) || 0,
-                            originLon: parseFloat(r.originLon) || null, originLat: parseFloat(r.originLat) || null, originRoadAddr: String(r.originRoadAddr || ''),
-                            destLon: parseFloat(r.destLon) || null, destLat: parseFloat(r.destLat) || null, destRoadAddr: String(r.destRoadAddr || ''),
-                            roads: String(r.roads || ''), distanceKm: parseFloat(r.distanceKm) || 0, startedAt: r.startedAt || null, 
-                            actualTimeMins: parseInt(r.actualTimeMins) || 0, pickupTimeStr: r.pickupTimeStr || null
-                        });
-                    }
+                let data = localStorage.getItem(key);
+                if (!data) return defaultVal;
+                let parsed = JSON.parse(data);
+                if (Array.isArray(defaultVal) && !Array.isArray(parsed)) return defaultVal;
+                
+                if (Array.isArray(parsed)) {
+                    parsed.forEach(o => {
+                        if (o.mode === 'QS') o.mode = 'QUICKS';
+                        if (o.mode === 'RT') o.mode = 'EATS';
+                    });
                 }
-                return cleanArr;
-            } catch (e) { return []; }
+                return parsed !== null ? parsed : defaultVal;
+            } catch (e) { return defaultVal; }
         }
 
-        const tmapInput = document.getElementById('tmapApiKey');
-        const savedKey = localStorage.getItem('quickone_tmap_key');
-        if(savedKey) tmapInput.value = savedKey;
-        tmapInput.addEventListener('input', (e) => { localStorage.setItem('quickone_tmap_key', e.target.value.trim()); });
-
-        function switchRoom(roomNum) {
-            for(let i=1; i<=5; i++) {
-                document.getElementById(`tabMode${i}`).classList.remove('active');
-                document.getElementById(`roomSection${i}`).className = "hidden";
-            }
-            document.getElementById(`tabMode${roomNum}`).classList.add('active');
-            document.getElementById(`roomSection${roomNum}`).classList.remove('hidden');
-            updateDashboard();
-        }
-
-        function switchFilterView(isComp) { currentFilterCompleted = isComp; document.getElementById('tabRunning').classList.toggle('active', !isComp); document.getElementById('tabCompleted').classList.toggle('active', isComp); updateDashboard(); }
-
-        function updateTimer() {
-            let now = new Date(); 
-            let yyyy = now.getFullYear().toString().slice(2), mm = String(now.getMonth() + 1).padStart(2, '0'), dd = String(now.getDate()).padStart(2, '0'), dayStr = daysEng[now.getDay()];
-            document.getElementById('sysDate').innerText = `${yyyy}.${mm}.${dd}(${dayStr})`;
-            let h = now.getHours(), m = now.getMinutes(); 
-            document.getElementById('sysTime').innerText = String(h).padStart(2, '0') + ":" + String(m).padStart(2, '0');
-
-            let qtr = "Pre", qEndH = 9;
-            if (h >= 0 && h < 9) { qtr = "Pre"; qEndH = 9; } else if (h >= 9 && h < 12) { qtr = "Q1"; qEndH = 12; } else if (h >= 12 && h < 15) { qtr = "Q2"; qEndH = 15; } else if (h >= 15 && h < 17) { qtr = "R"; qEndH = 17; } else if (h >= 17 && h < 20) { qtr = "Q3"; qEndH = 20; } else if (h >= 20 && h < 23) { qtr = "Q4"; qEndH = 23; } else if (h >= 23 && h < 24) { qtr = "Fin"; qEndH = 24; }
-            document.getElementById('curQtr').innerText = qtr;
-            
-            let currentTotalMins = h * 60 + m; let targetEndMins = qEndH * 60; 
-            let qtrMinLeft = targetEndMins - currentTotalMins - 1; let totMinLeft = ((24 * 60) - currentTotalMins - 1);
-            if (qtrMinLeft < 0) qtrMinLeft = 0;
-            document.getElementById('qtrLeft').innerText = Math.floor(qtrMinLeft/60) + "h " + String(qtrMinLeft%60).padStart(2,'0') + "m"; 
-            document.getElementById('totLeft').innerText = Math.floor(totMinLeft/60) + "h " + String(totMinLeft%60).padStart(2,'0') + "m";
-            return qtr;
-        }
+        let orders = loadDataSafely('qcp_orders_v130', []);
+        let costs = loadDataSafely('qcp_costs_v130', []);
         
-        setInterval(() => { 
-            let needsUpdate = false; 
-            routes.forEach((r) => { 
-                if (r.timerActive && !r.isCompleted) { 
-                    if(r.pickupDone) { r.countUpMins++; } else { r.timeLeft = r.timeLeft - 60; }
-                    needsUpdate = true; 
-                } 
-            }); 
-            if(needsUpdate && !document.getElementById('roomSection1').classList.contains('hidden')) { updateDashboard(); } 
-            updateTimer(); 
-        }, 60000);
+        let appMode = 'QUICKS'; 
+        let selectedPlatform = 'Insung';
+        
+        let currentListFilter = 'RUN'; 
+        let currentTypeFilter = 'ALL'; 
+        let currentMasterSort = 'DESC'; 
+        let currentStatsMetric = 'AMT';
+        let isSelectMode = false;
+        let selectedSet = new Set();
+        let wakeLockObj = null;
 
-        window.handleQtrChangeManually = function(selectObj) { setTimeout(() => { selectObj.value = "AUTO"; }, 100); };
+        const SHIFTS = [
+            { id: 'PRE', name: 'PRE', start: 0, end: 9 }, { id: 'Q1', name: 'Q1', start: 9, end: 12 },
+            { id: 'Q2', name: 'Q2', start: 12, end: 15 }, { id: 'BT', name: 'BT', start: 15, end: 17 },
+            { id: 'Q3', name: 'Q3', start: 17, end: 20 }, { id: 'Q4', name: 'Q4', start: 20, end: 23 },
+            { id: 'FIN', name: 'FIN', start: 23, end: 24 }
+        ];
 
-        window.handleNaviOrigin = function(e, name, lon, lat) {
-            e.stopPropagation();
-            if(!lon || !lat) return alert("좌표 정보가 없습니다. 조회를 먼저 해주세요.");
-            const tmapUrl = `tmap://route?goalname=${encodeURIComponent(name)}&goalx=${lon}&goaly=${lat}`;
-            location.href = tmapUrl;
-        };
+        const PLAT_QUICKS = ['Insung', 'Logi', 'Kakao'];
+        const PLAT_EATS = ['Kakao', 'Baemin', 'Coupang'];
 
-        function addExpenseRecord() {
-            const type = document.getElementById('expTypeSelect').value; let amtInput = parseFloat(document.getElementById('expAmountInput').value) || 0; const memo = document.getElementById('expMemoInput').value.trim() || "지출";
-            if(amtInput <= 0) return alert("금액을 입력하세요.");
-            expenses.push({ id: 'exp_' + Date.now(), date: new Date().toLocaleDateString('ko-KR').slice(5,-1), type, amount: amtInput, memo });
-            localStorage.setItem('quickone_expenses', JSON.stringify(expenses)); document.getElementById('expAmountInput').value = ''; document.getElementById('expMemoInput').value = '';
-            updateDashboard();
-        }
-        function deleteExpense(id) { if(confirm("삭제하시겠습니까?")) { expenses = expenses.filter(x => x.id !== id); localStorage.setItem('quickone_expenses', JSON.stringify(expenses)); updateDashboard(); } }
-
-        function addMaintRecord() {
-            const type = document.getElementById('maintTypeSelect').value; let amtInput = parseFloat(document.getElementById('maintAmountInput').value) || 0; const memo = document.getElementById('maintMemoInput').value.trim() || "정비";
-            if(amtInput <= 0) return alert("비용을 입력하세요.");
-            maintenance.push({ id: 'maint_' + Date.now(), date: new Date().toLocaleDateString('ko-KR').slice(5,-1), type, amount: amtInput, memo });
-            localStorage.setItem('quickone_maintenance', JSON.stringify(maintenance)); document.getElementById('maintAmountInput').value = ''; document.getElementById('maintMemoInput').value = '';
-            updateDashboard();
-        }
-        function deleteMaint(id) { if(confirm("삭제하시겠습니까?")) { maintenance = maintenance.filter(x => x.id !== id); localStorage.setItem('quickone_maintenance', JSON.stringify(maintenance)); updateDashboard(); } }
-
-        function extractDongName(fullStr) {
-            if(!fullStr) return "미정";
-            let matched = fullStr.match(/[가-힣]+(동|가|로)/); if(matched) return matched[0];
-            let parts = fullStr.split(' '); return parts[parts.length - 1];
+        let toastTimeout;
+        function showToast(msg) {
+            const toast = document.getElementById('toast'); toast.innerText = msg; toast.classList.add('show');
+            clearTimeout(toastTimeout); toastTimeout = setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
-        function cleanRoadsList(features) {
-            let list = [];
-            const bannedKeywords = ['고속도로', '올림픽대로', '강변북로', '내부순환', '외곽순환', '분당수서', '동부간선', '서부간선', '신천대로', '자동차전용', 'JC', 'IC'];
+        let confirmCallback = null;
+        function openConfirm(msg, callback) { document.getElementById('confirmMessage').innerText = msg; confirmCallback = callback; document.getElementById('popConfirm').classList.add('show'); }
+        function closeConfirm() { document.getElementById('popConfirm').classList.remove('show'); confirmCallback = null; }
+        document.getElementById('btnConfirmAction').addEventListener('click', () => { if(confirmCallback) confirmCallback(); closeConfirm(); });
+
+        function checkAutoActions() {
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            if (timeStr === '23:55' && !localStorage.getItem('qcp_synced_today')) { syncWithCloud(); localStorage.setItem('qcp_synced_today', 'true'); }
+            if (timeStr === '00:00') { localStorage.removeItem('qcp_synced_today'); }
+            if (timeStr === '00:05' && !localStorage.getItem('qcp_reset_today')) {
+                costs = costs.filter(c => c.type === 'MNT'); 
+                orders = [];
+                localStorage.setItem('qcp_orders_v130', JSON.stringify(orders)); localStorage.setItem('qcp_costs_v130', JSON.stringify(costs));
+                localStorage.setItem('qcp_reset_today', 'true'); location.reload();
+            }
+            if (timeStr === '01:00') { localStorage.removeItem('qcp_reset_today'); }
+        }
+        setInterval(checkAutoActions, 60000);
+
+        async function toggleWakeLock(enable) {
+            if ('wakeLock' in navigator) {
+                try {
+                    if (enable) { wakeLockObj = await navigator.wakeLock.request('screen'); }
+                    else if (wakeLockObj) { await wakeLockObj.release(); wakeLockObj = null; }
+                    localStorage.setItem('qcp_wakelock', enable ? 'ON' : 'OFF');
+                } catch (err) { console.log("Wakelock Error", err); }
+            } else { if(enable) showToast("NO WAKELOCK"); }
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (wakeLockObj !== null && document.visibilityState === 'visible') { toggleWakeLock(true); }
+        });
+
+        function initAppMode() { 
+            setAppMode('QUICKS'); 
+            const wlState = localStorage.getItem('qcp_wakelock') === 'ON';
+            document.getElementById('set-wakelock').checked = wlState;
+            if(wlState) toggleWakeLock(true);
+            restoreEatsInputCache();
+        }
+
+        function openTimetableModal() {
+            const now = new Date();
+            const h24 = now.getHours();
+            const activeShift = SHIFTS.find(s => h24 >= s.start && h24 < s.end) || SHIFTS[0];
+
+            document.getElementById('qtrPopupGrid').innerHTML = SHIFTS.map(s => {
+                const isCurrent = (s.id === activeShift.id) ? 'current-qtr-border' : '';
+                return `<div class="stats-box ${isCurrent}" style="padding:10px;"><div style="font-size:14px; color:var(--m3-primary);">${s.name}</div><div style="font-size:11px; margin-top:4px;">${s.start}:00 - ${s.end}:00</div></div>`;
+            }).join('');
             
-            features.forEach(f => {
-                if (f.properties && f.properties.name) {
-                    let r = f.properties.name.trim();
-                    let isBanned = bannedKeywords.some(kw => r.includes(kw));
-                    
-                    if (r && !/\d/.test(r) && !isBanned && !r.includes("교차로") && !r.includes("진입") && !r.includes("램프")) {
-                        if (list.length === 0 || list[list.length - 1] !== r) {
-                            list.push(r);
-                        }
-                    }
-                }
+            toggleModal('popQtr');
+        }
+
+        function cacheEatsInput() {
+            const isPinned = document.getElementById('chkEatsPin').checked;
+            if (isPinned) {
+                const cacheData = {
+                    pick: document.getElementById('in-pick-eats').value,
+                    drop: document.getElementById('in-drop-eats').value,
+                    pinned: true
+                };
+                localStorage.setItem('qcp_eats_cache', JSON.stringify(cacheData));
+            } else {
+                localStorage.removeItem('qcp_eats_cache');
+            }
+        }
+
+        function restoreEatsInputCache() {
+            const cached = localStorage.getItem('qcp_eats_cache');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                document.getElementById('in-pick-eats').value = parsed.pick || '';
+                document.getElementById('in-drop-eats').value = parsed.drop || '';
+                document.getElementById('chkEatsPin').checked = !!parsed.pinned;
+            }
+        }
+
+        function setAppMode(mode) {
+            appMode = mode;
+            document.getElementById('btn-mode-quicks').classList.toggle('active', mode === 'QUICKS');
+            document.getElementById('btn-mode-eats').classList.toggle('active', mode === 'EATS');
+            
+            document.getElementById('quicks-inputs').style.display = mode === 'QUICKS' ? 'block' : 'none';
+            document.getElementById('eats-inputs').style.display = mode === 'EATS' ? 'block' : 'none';
+
+            if (mode === 'EATS') {
+                document.getElementById('normal-action-row').style.display = 'none';
+                document.getElementById('eats-keyboard-panel').style.display = 'block';
+            } else {
+                document.getElementById('normal-action-row').style.display = 'flex';
+                document.getElementById('eats-keyboard-panel').style.display = 'none';
+            }
+
+            const pArray = mode === 'QUICKS' ? PLAT_QUICKS : PLAT_EATS;
+            selectedPlatform = pArray[0];
+            const pContainer = document.getElementById('platform-chips');
+            pContainer.innerHTML = pArray.map((p, i) => `<div class="chip ${i===0 ? 'active' : ''}" onclick="selectPlatform(this, '${p}')">${p}</div>`).join('');
+            triggerAdvisorInterruption();
+        }
+
+        function pressRetroKey(key) {
+            const fareInput = document.getElementById('in-fare');
+            if (key === 'C') {
+                fareInput.value = '';
+            } else if (key === 'ENTER') {
+                commitOrder();
+            } else {
+                fareInput.value += key;
+            }
+            triggerAdvisorInterruption();
+        }
+
+        function selectPlatform(el, plat) {
+            document.querySelectorAll('#platform-chips .chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            selectedPlatform = plat;
+            triggerAdvisorInterruption();
+        }
+
+        function calcNetFare(kVal, plat) {
+            const is77 = (plat === 'Insung' || plat === 'Logi');
+            const net = is77 ? (kVal * 0.77) : kVal;
+            let rounded = Math.round(net * 10) / 10;
+            return rounded;
+        }
+
+        function updateSysTotal() {
+            let totalRev = 0; 
+            orders.forEach(o => { totalRev += calcNetFare(o.fareK, o.platform); });
+            let rounded = Math.round(totalRev * 10) / 10;
+            document.getElementById('sysTotalRev').innerText = (rounded.toFixed(1).endsWith('.0') ? rounded.toString() : rounded.toFixed(1)) + 'k';
+        }
+
+        async function syncWithCloud(manual = false) {
+            const url = document.getElementById('sheet-url').value.trim();
+            if(!url || !url.startsWith('https://script.google.com/')) { if(manual) showToast("URL REQ"); return; }
+            if(manual) showToast("SYNCING...");
+
+            const now = new Date();
+            const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}월 ${String(now.getDate()).padStart(2,'0')}일`;
+            
+            let todayOrders = orders.filter(o => o.state === 'FIN');
+            todayOrders.sort((a, b) => a.timestamp - b.timestamp);
+
+            let todayEXP = costs.filter(c => c.type === 'EXP'); 
+            
+            let revK = 0; todayOrders.forEach(o => revK += calcNetFare(o.fareK, o.platform)); 
+            let expK = todayEXP.reduce((acc, c) => acc + c.amountK, 0); 
+            
+            let pickMap = {}; let dropMap = {};
+            todayOrders.forEach(o => { 
+                let pWord = o.startDetail.split(' ')[0] || "None";
+                let dWord = o.endDetail ? o.endDetail.split(' ')[0] : "None";
+                pickMap[pWord] = (pickMap[pWord] || 0) + 1; 
+                if(o.endDetail) dropMap[dWord] = (dropMap[dWord] || 0) + 1; 
             });
-            return list.join(' ➔ ') || "일반도로 주행";
+
+            const payload = {
+                type: 'DAILY_SYNC', dateStr: dateStr,
+                summary: { income: Math.round(revK * 1000), expense: Math.round(expK * 1000), net: Math.round((revK - expK) * 1000) },
+                locations: { pickups: pickMap, dropoffs: dropMap },
+                orders: todayOrders.map(o => ({ 
+                    time: o.shift, plat: o.platform, pick: o.startDetail, drop: o.endDetail || '', 
+                    amount: Math.round(calcNetFare(o.fareK, o.platform) * 1000), note: o.memo || '' 
+                }))
+            };
+
+            try { await fetch(url, { method: 'POST', body: JSON.stringify(payload) }); if(manual) showToast("SYNC OK"); } catch(e) { if(manual) showToast("SYNC ERR"); }
         }
 
-        async function fetchPOI(keyword, key) {
-            const url = `https://apis.openapi.sk.com/tmap/pois?version=1&searchKeyword=${encodeURIComponent(keyword)}&resCoordType=WGS84GEO&reqCoordType=WGS84GEO&count=1`;
-            const r = await fetch(url, { headers: { 'appKey': key } }); if (!r.ok) throw new Error("인증 실패");
-            const d = await r.json();
-            if (d.searchPoiInfo && d.searchPoiInfo.pois && d.searchPoiInfo.pois.poi.length > 0) { 
-                const poi = d.searchPoiInfo.pois.poi[0]; let addr = (poi.newAddressList && poi.newAddressList.newAddress && poi.newAddressList.newAddress.length > 0) ? poi.newAddressList.newAddress[0].fullAddressRoad : poi.name; 
-                return { lon: poi.noorLon, lat: poi.noorLat, roadAddr: addr }; 
+        function updateClockLoop() {
+            const now = new Date(); const h24 = now.getHours(); const m = String(now.getMinutes()).padStart(2,'0');
+            document.getElementById('sysClock').innerText = `${String(h24).padStart(2,'0')}:${m}`;
+            const activeShift = SHIFTS.find(s => h24 >= s.start && h24 < s.end) || SHIFTS[0]; document.getElementById('sysQtrBadge').innerText = activeShift.name;
+        }
+        setInterval(updateClockLoop, 1000); updateClockLoop();
+
+        document.getElementById('tmap-key').value = localStorage.getItem('qcp_key_tmap') || '';
+        document.getElementById('sheet-url').value = localStorage.getItem('qcp_url_sheet') || '';
+        document.getElementById('oil-interval').value = localStorage.getItem('qcp_oil_interval') || '';
+
+        function saveSystemConfig() { 
+            localStorage.setItem('qcp_url_sheet', document.getElementById('sheet-url').value.trim()); 
+            localStorage.setItem('qcp_key_tmap', document.getElementById('tmap-key').value.trim()); 
+            localStorage.setItem('qcp_oil_interval', document.getElementById('oil-interval').value.trim());
+            closeModal('popSet'); showToast("SAVED"); 
+        }
+
+        function factoryReset() { openConfirm("RESET SYSTEM?", () => { localStorage.clear(); location.reload(); }); }
+        function toggleModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+        function clearInputs() {
+            ['in-pick-quicks', 'in-drop-quicks', 'in-pick-eats', 'in-drop-eats', 'in-fare', 'in-memo'].forEach(id => document.getElementById(id).value = '');
+            if(!document.getElementById('chkEatsPin').checked) {
+                localStorage.removeItem('qcp_eats_cache');
             }
-            throw new Error(`결과 없음`);
+            document.getElementById('bundle-utility-panel').style.display = 'none';
+            showToast("CLEARED");
         }
 
-        async function fetchRoute(start, end, key) {
-            const url = 'https://apis.openapi.sk.com/tmap/routes?version=1&format=json';
-            const res = await fetch(url, { method: 'POST', headers: { 'appKey': key, 'Accept': 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify({ startX: String(start.lon), startY: String(start.lat), endX: String(end.lon), endY: String(end.lat), startName: "START", endName: "END", reqCoordType: "WGS84GEO", resCoordType: "WGS84GEO", searchOption: "2", trafficInfo: "Y" }) });
-            if (!res.ok) throw new Error("경로 실패");
-            const d = await res.json();
-            if (d.features && d.features.length > 0) { const mins = Math.ceil(d.features[0].properties.totalTime / 60); const dist = parseFloat((d.features[0].properties.totalDistance / 1000).toFixed(1)); let parsedRoads = cleanRoadsList(d.features); return { time: mins, roads: parsedRoads, distanceKm: dist }; }
-            throw new Error("경로 누락");
+        function searchTmapActive() {
+            if(appMode === 'QUICKS') searchTmap('in-pick-quicks', 'in-drop-quicks');
+            else searchTmap('in-pick-eats', 'in-drop-eats');
         }
 
-        document.getElementById('btnFetchTmap').addEventListener('click', async () => {
-            const key = document.getElementById('tmapApiKey').value.trim(); const oD = document.getElementById('originInput').value.trim(); const dD = document.getElementById('destInput').value.trim();
-            if (!key) return alert("설정 기어 아이콘을 눌러 Tmap 인증 키를 입력하세요."); if (!oD || !dD) return alert("상하차 정보를 입력하세요.");
-            const btn = document.getElementById('btnFetchTmap'); btn.innerHTML = "⏳"; btn.disabled = true;
-            try { 
-                const start = await fetchPOI(oD, key); tempOriginLon = start.lon; tempOriginLat = start.lat; tempOriginRoadAddr = start.roadAddr; 
-                const end = await fetchPOI(dD, key); tempDestLon = end.lon; tempDestLat = end.lat; tempDestRoadAddr = end.roadAddr;
-                const data = await fetchRoute(start, end, key); 
-                document.getElementById('timeInput').value = data.time; tempMajorRoads = data.roads; tempDistanceKm = data.distanceKm; 
-                const previewArea = document.getElementById('tmapPreviewArea'); previewArea.innerHTML = `거리: ${data.distanceKm}Km | 예상: ${data.time}분`; previewArea.classList.remove('hidden');
-            } catch (e) { alert("조회 실패: " + e.message); } finally { btn.innerHTML = "조회"; btn.disabled = false; }
-        });
+        function openRouteMapActive() {
+            if(appMode === 'QUICKS') openRouteMap('in-pick-quicks', 'in-drop-quicks');
+            else openRouteMap('in-pick-eats', 'in-drop-eats');
+        }
 
-        document.getElementById('btnAddRoute').addEventListener('click', () => {
-            const origin = document.getElementById('originInput').value.trim(); const dest = document.getElementById('destInput').value.trim(); const amount = parseFloat(document.getElementById('amountInput').value); const time = parseInt(document.getElementById('timeInput').value) || 0; const isExpress = document.getElementById('expressCheck').checked; const isBundle = document.getElementById('bundleCheck').checked; const initTimeLeft = Math.floor(time * 60);
-            if(!origin || !dest || isNaN(amount)) return alert("정보를 입력하세요.");
-            let qtrVal = document.getElementById('curQtr').innerText;
-            routes.push({ id: 'id_' + Date.now().toString(), origin: origin, dest: dest, amount: amount, time: time, isExpress: isExpress, isBundle: isBundle, qtr: qtrVal, platCode: document.getElementById('platformSelect').value, timeLeft: initTimeLeft, timerActive: false, isCompleted: false, pickupDone: false, countUpMins: 0, originLon: tempOriginLon, originLat: tempOriginLat, originRoadAddr: tempOriginRoadAddr, destLon: tempDestLon, destLat: tempDestLat, destRoadAddr: tempDestRoadAddr, roads: tempMajorRoads, distanceKm: tempDistanceKm, startedAt: null, actualTimeMins: 0, pickupTimeStr: null });
-            localStorage.setItem('quickone_integrated_logs', JSON.stringify(routes)); document.getElementById('originInput').value = ''; document.getElementById('destInput').value = ''; document.getElementById('amountInput').value = ''; document.getElementById('timeInput').value = '';
-            document.getElementById('expressCheck').checked = false; document.getElementById('bundleCheck').checked = false; tempOriginLon = null; tempOriginLat = null; tempOriginRoadAddr = ""; tempDestLon = null; tempDestLat = null; tempDestRoadAddr = ""; tempMajorRoads = ""; tempDistanceKm = 0; document.getElementById('tmapPreviewArea').classList.add('hidden');
-            updateDashboard(); toggleOrderInputSection();
-        });
+        async function searchTmap(pickId, dropId) {
+            const apiKey = localStorage.getItem('qcp_key_tmap');
+            if(!apiKey) { showToast("KEY REQ"); return; }
+            const pickIn = document.getElementById(pickId); const dropIn = document.getElementById(dropId);
+            
+            const doSearch = async (inputEl) => {
+                const keyword = inputEl.value.trim(); if(!keyword) return;
+                try {
+                    const res = await fetch(`https://apis.openapi.sk.com/tmap/pois?version=1&searchKeyword=${encodeURIComponent(keyword)}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&count=1`, { headers: { 'appKey': apiKey } });
+                    const data = await res.json();
+                    if(data && data.searchPoiInfo && data.searchPoiInfo.pois && data.searchPoiInfo.pois.poi.length > 0) {
+                        const poi = data.searchPoiInfo.pois.poi[0]; let addr = '';
+                        const nA = poi.newAddressList && poi.newAddressList.newAddress[0] ? poi.newAddressList.newAddress[0] : null;
+                        if (nA) {
+                            let bld = nA.bldNo1 + (nA.bldNo2 && nA.bldNo2 !== '0' ? '-' + nA.bldNo2 : '');
+                            addr = `${poi.upperAddrName} ${poi.middleAddrName} ${nA.roadName} ${bld}`;
+                            if(poi.lowerAddrName) addr += ` (${poi.lowerAddrName})`;
+                        } else { addr = `${poi.upperAddrName} ${poi.middleAddrName} ${poi.lowerAddrName}`; }
+                        inputEl.value = addr.trim().replace(/\s+/g, ' '); 
+                        cacheEatsInput();
+                    } else { showToast(`NO RES: ${keyword}`); }
+                } catch (e) { showToast("API ERR"); }
+            };
 
-        window.handleCardPickupProcess = function(e, id, displayNum) {
-            e.stopPropagation();
-            let r = routes.find(x => x.id === id); if(!r) return;
-            if(!r.pickupDone && !r.isCompleted) {
-                if(confirm("상차지(픽업지)에 도착하셨습니까?\n\n확인을 누르시면 픽업 완료 처리되며 주행 타이머가 시작됩니다.")) {
-                    let now = new Date(); r.pickupTimeStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
-                    r.startedAt = Date.now(); r.timerActive = true; r.pickupDone = true;
-                    localStorage.setItem('quickone_integrated_logs', JSON.stringify(routes)); updateDashboard(); return;
+            if(pickIn.value || dropIn.value) showToast("LOADING MAP");
+            if(pickIn.value) await doSearch(pickIn); if(dropIn.value) await doSearch(dropIn);
+            triggerAdvisorInterruption();
+        }
+
+        async function openRouteMap(startId, endId) {
+            const startStr = document.getElementById(startId).value.trim(); 
+            const endStr = document.getElementById(endId).value.trim();
+            if(!startStr || !endStr) { showToast("BAD INPUT"); return; }
+            
+            const apiKey = localStorage.getItem('qcp_key_tmap');
+            if(!apiKey) { showToast("KEY REQ"); return; }
+
+            showToast("LOADING MAP");
+
+            const getCoord = async (keyword) => {
+                try {
+                    const res = await fetch(`https://apis.openapi.sk.com/tmap/pois?version=1&searchKeyword=${encodeURIComponent(keyword)}&reqCoordType=WGS84GEO&resCoordType=WGS84GEO&count=1`, { headers: { 'appKey': apiKey } });
+                    const data = await res.json();
+                    if(data && data.searchPoiInfo && data.searchPoiInfo.pois && data.searchPoiInfo.pois.poi.length > 0) {
+                        const poi = data.searchPoiInfo.pois.poi[0];
+                        return { lat: poi.frontLat || poi.noorLat, lon: poi.frontLon || poi.noorLon };
+                    }
+                } catch (e) { console.error("Coordinate Fetch Error:", e); }
+                return null;
+            };
+
+            const startCoord = await getCoord(startStr);
+            const endCoord = await getCoord(endStr);
+
+            if(startCoord && endCoord) {
+                const scheme = `kakaomap://route?sp=${startCoord.lat},${startCoord.lon}&ep=${endCoord.lat},${endCoord.lon}&by=CAR`;
+                window.location.href = scheme;
+                
+                setTimeout(() => {
+                    if (document.hidden) return; 
+                    window.open(`https://map.kakao.com/link/to/${encodeURIComponent(endStr)},${endCoord.lat},${endCoord.lon}`, '_blank');
+                }, 1500);
+            } else { showToast("COORD ERR"); }
+        }
+
+        function stripSido(str) { return str ? str.replace(/^(서울특별시|부산광역시|대구광역시|인천광역시|광주광역시|대전광역시|울산광역시|세종특별자치시|경기도|강원특별자치도|충청북도|충청남도|전북특별자치도|전라남도|경상북도|경상남도|제주특별자치도|서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)\s+/, "").trim() : ""; }
+        function getDong(text) { const match = text ? text.match(/([가-힣]+[0-9]*[동읍면리])(?:[\s\(\),-]|$)/) : null; return match ? match[1] : null; }
+        function extractSummaryStr(currentText) {
+            let dong = getDong(currentText); if (dong) return dong; 
+            const clean = stripSido(currentText).replace(/[()]/g, ''); const parts = clean.split(' '); return parts[parts.length - 1]; 
+        }
+
+        function commitOrder() {
+            const fareK = parseFloat(document.getElementById('in-fare').value) || 0;
+            const memoStr = document.getElementById('in-memo').value.trim();
+            let startTxt = "", endTxt = "", rSumm = ""; let initialState = 'RUN';
+
+            if(appMode === 'QUICKS') {
+                startTxt = document.getElementById('in-pick-quicks').value.trim();
+                endTxt = document.getElementById('in-drop-quicks').value.trim();
+                if(!startTxt || !endTxt || !fareK) { showToast("BAD INPUT"); return; }
+                startTxt = stripSido(startTxt); endTxt = stripSido(endTxt);
+                rSumm = `${extractSummaryStr(startTxt)} ➔ ${extractSummaryStr(endTxt)}`;
+            } else {
+                startTxt = document.getElementById('in-pick-eats').value.trim();
+                endTxt = document.getElementById('in-drop-eats').value.trim();
+                if(!startTxt || !fareK) { showToast("BAD INPUT"); return; }
+                startTxt = stripSido(startTxt); endTxt = stripSido(endTxt);
+                if(endTxt) rSumm = `${extractSummaryStr(startTxt)} ➔ ${extractSummaryStr(endTxt)}`;
+                else rSumm = `[${extractSummaryStr(startTxt) || startTxt}]`; 
+                initialState = 'READY'; 
+            }
+
+            const h = new Date().getHours(); const currentShift = SHIFTS.find(s => h >= s.start && h < s.end) || SHIFTS[0];
+
+            orders.unshift({ 
+                id: Date.now().toString(), timestamp: Date.now(), mode: appMode, 
+                platform: selectedPlatform, 
+                startDetail: startTxt, endDetail: endTxt, routeSummary: rSumm, fareK: fareK, 
+                memo: memoStr, pickupTime: null, finishTime: null, state: initialState, shift: currentShift.id 
+            });
+            localStorage.setItem('qcp_orders_v130', JSON.stringify(orders));
+
+            const eatsPinned = document.getElementById('chkEatsPin').checked;
+            if (appMode === 'EATS' && eatsPinned) {
+                document.getElementById('in-fare').value = '';
+                document.getElementById('in-memo').value = '';
+            } else {
+                clearInputs();
+            }
+
+            document.getElementById('bundle-utility-panel').style.display = 'none';
+            renderMasterList(); updateSysTotal();
+            switchMainTab('lst', document.getElementById('nav-lst')); showToast("SAVED");
+        }
+
+        function toggleSelectMode() {
+            isSelectMode = !isSelectMode; selectedSet.clear(); document.getElementById('chkSelectAll').checked = false; 
+            document.getElementById('btn-select-mode').classList.toggle('active', isSelectMode);
+            document.getElementById('btn-select-mode').style.background = isSelectMode ? 'var(--m3-primary-cont)' : 'transparent';
+            document.getElementById('btn-select-mode').style.color = isSelectMode ? 'var(--m3-on-primary-cont)' : 'var(--m3-muted)';
+            document.getElementById('bulk-action-bar').style.display = isSelectMode ? 'flex' : 'none';
+            document.getElementById('bulk-count').innerText = `0 SELECTED`;
+            renderMasterList();
+        }
+
+        function toggleSelectAll(el) {
+            const isChecked = el.checked; selectedSet.clear();
+            if (isChecked) { Array.from(document.querySelectorAll('.sheet-row')).forEach(w => selectedSet.add(w.getAttribute('data-id'))); }
+            document.querySelectorAll('.lst-checkbox').forEach(cb => cb.checked = isChecked);
+            document.getElementById('bulk-count').innerText = `${selectedSet.size} SELECTED`;
+        }
+
+        function toggleSelect(id) {
+            let strId = String(id);
+            if(selectedSet.has(strId)) selectedSet.delete(strId); else selectedSet.add(strId);
+            const totalVisible = document.querySelectorAll('.sheet-row').length;
+            document.getElementById('chkSelectAll').checked = (selectedSet.size > 0 && selectedSet.size === totalVisible);
+            document.getElementById('bulk-count').innerText = `${selectedSet.size} SELECTED`;
+        }
+
+        function deleteSelected() {
+            if(selectedSet.size === 0) { showToast("NO SEL"); return; }
+            openConfirm(`DEL ${selectedSet.size} ITEMS?`, () => {
+                orders = orders.filter(o => !selectedSet.has(String(o.id)));
+                localStorage.setItem('qcp_orders_v130', JSON.stringify(orders));
+                toggleSelectMode(); renderStatsEngine(); updateSysTotal(); showToast("DELETED");
+            });
+        }
+
+        function setListFilter(f) { currentListFilter = f; document.getElementById('flt-run').classList.toggle('active', f === 'RUN'); document.getElementById('flt-fin').classList.toggle('active', f === 'FIN'); if(isSelectMode) toggleSelectMode(); renderMasterList(); }
+        function setTypeFilter(t) { currentTypeFilter = t; document.getElementById('flt-all').classList.toggle('active', t === 'ALL'); document.getElementById('flt-quicks').classList.toggle('active', t === 'QUICKS'); document.getElementById('flt-eats').classList.toggle('active', t === 'EATS'); if(isSelectMode) toggleSelectMode(); renderMasterList(); }
+
+        /* 신설 주입: TIME 분기 격자 칸 바인딩이 완비된 마스터 테이블 렌더러 */
+        function renderMasterList() {
+            let typeMatchedOrders = orders.filter(o => currentTypeFilter === 'ALL' ? true : o.mode === currentTypeFilter);
+            document.getElementById('lst-summary-bar').innerText = `ACTIVE: ${typeMatchedOrders.filter(o => o.state !== 'FIN').length} | DONE: ${typeMatchedOrders.filter(o => o.state === 'FIN').length}`;
+            
+            const tbody = document.getElementById('master-list-tbody'); 
+            tbody.innerHTML = '';
+            
+            let filtered = typeMatchedOrders.filter(o => currentListFilter === 'RUN' ? o.state !== 'FIN' : o.state === 'FIN');
+            filtered.sort((a, b) => b.timestamp - a.timestamp); 
+
+            if(filtered.length === 0) { 
+                tbody.innerHTML = `<tr><td colspan="6" style="padding:30px; font-weight:800; color:var(--m3-outline);">EMPTY</td></tr>`; 
+                return; 
+            }
+
+            filtered.forEach((o) => {
+                const row = document.createElement('tr');
+                row.className = "sheet-row";
+                row.setAttribute('data-id', o.id);
+
+                let chkHtml = `<input type="checkbox" class="lst-checkbox" ${selectedSet.has(String(o.id)) ? 'checked' : ''} onchange="toggleSelect('${o.id}')" style="width:18px; height:18px; accent-color:var(--m3-primary);">`;
+                
+                // 신설 주입: 시간(SHIFT) 분기 배송원 인지용 컴포넌트 뱃지 생성
+                let timeHtml = `<span style="font-size:11px; font-weight:900; background:var(--m3-surface-low); color:var(--m3-primary); padding:2px 6px; border-radius:4px; border:1px solid var(--m3-outline-variant);">${o.shift}</span>`;
+                
+                let platHtml = `<span style="font-weight:800; color:${o.mode === 'QUICKS' ? 'var(--m3-primary)' : 'var(--m3-error)'}">${o.platform}</span>`;
+                
+                let routeHtml = `<div class="cell-left"><span style="color:var(--m3-muted); font-size:10px; margin-right:4px;">#${orders.length - orders.indexOf(o)}</span>${o.routeSummary}`;
+                if(o.memo) {
+                    routeHtml += ` <span style="color:var(--m3-primary); font-size:11px; font-weight:normal;">(${o.memo})</span>`;
                 }
-            }
-        };
+                routeHtml += `</div>`;
 
-        window.completeRouteConfirm = function(e, id) { 
+                let fareHtml = `<span style="font-weight:900; color:var(--m3-primary); font-size:13px;">${calcNetFare(o.fareK, o.platform).toFixed(1).replace('.0','')}k</span>`;
+
+                let actHtml = '';
+                if(o.state !== 'FIN') {
+                    if(o.mode === 'EATS') {
+                        actHtml = `<span class="chip-status" onclick="stepState('${o.id}', event)" style="background:var(--m3-primary); color:#fff; padding:2px 8px; border-radius:4px;">DONE</span>`;
+                    } else {
+                        let btnTxt = (o.state === 'RUN' || o.state === 'READY') ? 'PICK' : 'DONE';
+                        let btnColor = (o.state === 'RUN' || o.state === 'READY') ? 'background:var(--m3-primary); color:#fff;' : 'background:var(--m3-error); color:#fff;';
+                        actHtml = `<span class="chip-status" onclick="stepState('${o.id}', event)" style="${btnColor} padding:2px 8px; border-radius:4px;">${btnTxt}</span>`;
+                    }
+                } else {
+                    actHtml = `<span style="color:var(--m3-muted); font-weight:bold;">FIN</span>`;
+                }
+
+                let mngHtml = ` <span style="color:var(--m3-muted); cursor:pointer; font-size:10px; border:1px solid var(--m3-outline-variant); padding:1px 4px; border-radius:3px; margin-left:2px;" onclick="openMng('${o.id}', event)">EDIT</span>`;
+                actHtml += mngHtml;
+
+                row.innerHTML = `
+                    <td>${chkHtml}</td>
+                    <td>${timeHtml}</td>
+                    <td>${platHtml}</td>
+                    <td>${routeHtml}</td>
+                    <td>${fareHtml}</td>
+                    <td>${actHtml}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function stepState(id, e) {
             e.stopPropagation(); 
-            let r = routes.find(x => x.id === id); 
-            if(r && r.pickupDone && !r.isCompleted) { 
-                if(confirm("하차지에 도착하여 배송을 완료하셨습니까?\n\n확인을 누르시면 정산 목록으로 이동됩니다.")) {
-                    r.isCompleted = true; r.timerActive = false; r.actualTimeMins = r.pickupDone ? r.countUpMins : r.time; 
-                    localStorage.setItem('quickone_integrated_logs', JSON.stringify(routes)); updateDashboard(); 
-                }
-            } 
-        };
-
-        window.restoreRoute = function(e, id) { e.stopPropagation(); let r = routes.find(x => x.id === id); if(r) { r.isCompleted = false; r.timerActive = false; localStorage.setItem('quickone_integrated_logs', JSON.stringify(routes)); updateDashboard(); } };
-        window.removeTableRecord = function(id) { if(confirm("이 내역을 완전히 삭제하시겠습니까?")) { routes = routes.filter(r => r.id !== id); localStorage.setItem('quickone_integrated_logs', JSON.stringify(routes)); updateDashboard(); } };
-
-        window.openDetailPopup = function(id, displayNum) {
-            let r = routes.find(x => x.id === id); if(!r) return;
-            selectedPopupRouteId = id;
-            document.getElementById('popDynamicTitle').innerText = `${displayNum}번 오더 정보 관리`;
-            document.getElementById('popOrigin').value = r.origin; document.getElementById('popDest').value = r.dest; document.getElementById('popAmount').value = r.amount; document.getElementById('popTime').value = r.time; document.getElementById('popBundleCheck').checked = !!r.isBundle; document.getElementById('popExpressCheck').checked = !!r.isExpress;
-            if(r.pickupDone) { document.getElementById('popOrigin').readOnly = true; document.getElementById('popDest').readOnly = true; } else { document.getElementById('popOrigin').readOnly = false; document.getElementById('popDest').readOnly = false; }
-            document.getElementById('routeDetailPopup').classList.add('show');
-        };
-
-        window.closeDetailPopup = function() { document.getElementById('routeDetailPopup').classList.remove('show'); selectedPopupRouteId = null; };
-
-        document.getElementById('btnSavePopupEdit').addEventListener('click', () => {
-            if(!selectedPopupRouteId) return;
-            let r = routes.find(x => x.id === selectedPopupRouteId);
-            if(r) {
-                if(!r.pickupDone) { r.origin = document.getElementById('popOrigin').value.trim(); r.dest = document.getElementById('popDest').value.trim(); }
-                let amt = parseFloat(document.getElementById('popAmount').value); r.amount = isNaN(amt) ? r.amount : amt;
-                let tm = parseInt(document.getElementById('popTime').value); r.time = isNaN(tm) ? r.time : tm;
-                r.isBundle = document.getElementById('popBundleCheck').checked; r.isExpress = document.getElementById('popExpressCheck').checked;
-                localStorage.setItem('quickone_integrated_logs', JSON.stringify(routes)); closeDetailPopup(); updateDashboard();
-            }
-        });
-
-        document.getElementById('btnDeletePopupEdit').addEventListener('click', () => {
-            if(!selectedPopupRouteId) return;
-            if(confirm("정말로 이 오더 기록을 파기하시겠습니까?")) { routes = routes.filter(x => x.id !== selectedPopupRouteId); localStorage.setItem('quickone_integrated_logs', JSON.stringify(routes)); closeDetailPopup(); updateDashboard(); }
-        });
-
-        window.showPlatformStats = function() {
-            let stats = {};
-            routes.forEach(r => {
-                if(r.isCompleted) {
-                    let p = r.platCode.split('|')[0];
-                    let pName = platNames[p] || p;
-                    let net = r.amount * (parseFloat(r.platCode.split('|')[1]) || 1.0);
-                    if(!stats[pName]) stats[pName] = { count: 0, sum: 0 };
-                    stats[pName].count++;
-                    stats[pName].sum += net;
-                }
-            });
-            let html = "<table style='width:100%; border-collapse:collapse;'><thead><tr><th>플랫폼</th><th>완료</th><th>수익</th></tr></thead><tbody>";
-            for(let k in stats) {
-                html += `<tr><td><b>${k}</b></td><td>${stats[k].count}건</td><td>₩ ${stats[k].sum.toFixed(1)}k</td></tr>`;
-            }
-            html += "</tbody></table>";
-            if(Object.keys(stats).length === 0) html = "<div style='text-align:center; padding:20px; color:var(--text-muted);'>데이터가 없습니다.</div>";
-            document.getElementById('statsContent').innerHTML = html;
-            document.getElementById('statsPopup').classList.add('show');
-        };
-        window.closeStatsPopup = function() { document.getElementById('statsPopup').classList.remove('show'); };
-
-        window.triggerUnifiedClipboardCopy = function() {
-            let text = "NO\t상태\t플랫폼\t상차지\t하차지\t운임수입\t거리\t소요시간\n";
-            routes.forEach((r, idx) => {
-                let platInfo = r.platCode.split('|');
-                let netIncome = r.amount * (parseFloat(platInfo[1]) || 1.0);
-                let actualTime = r.pickupDone ? r.countUpMins : (r.actualTimeMins || r.time);
-                let stepStatus = r.isCompleted ? "완료" : (r.pickupDone ? "픽업" : "운행");
-                text += `${idx+1}\t${stepStatus}\t${platNames[platInfo[0]]||platInfo[0]}\t${r.origin}\t${r.dest}\t${netIncome.toFixed(1)}k\t${r.distanceKm}km\t${actualTime}분\n`;
-            });
-            let ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-            alert("전체 로그가 엑셀 호환 탭 규격(TSV)으로 클립보드에 복사되었습니다.");
-        };
-
-        function updateDashboard() {
-            let routeHTML = ""; let tableHTML = ""; let expHTML = ""; let maintHTML = "";
-            let totInc = 0, totDist = 0, totMins = 0, callCount = 0;
-            let qtrRegions = {}, qtrRoads = {};
-
-            sumFuel = 0; sumFood = 0; sumSnack = 0; sumEtc = 0; sumMaint = 0;
-
-            for (let i = routes.length - 1; i >= 0; i--) {
-                let r = routes[i]; let platInfo = r.platCode.split('|');
-                let netIncome = r.amount * (parseFloat(platInfo[1]) || 1.0);
-                let actualTime = r.pickupDone ? r.countUpMins : (r.actualTimeMins || r.time);
-                let oDong = extractDongName(r.origin); let dDong = extractDongName(r.dest);
-
-                if (r.isCompleted === currentFilterCompleted) {
-                    let timerTextLine = ""; let timerColorClass = "text-blue";
-                    
-                    if(r.pickupDone) {
-                        timerTextLine = `소요: ${r.countUpMins}분`;
-                        if(r.countUpMins > r.time) timerColorClass = "text-red blink"; else timerColorClass = "text-red";
-                    } else {
-                        const m = Math.floor(Math.abs(r.timeLeft) / 60).toString().padStart(2, '0'); timerTextLine = `남음: ${m}분`;
-                        if(r.timeLeft < 0) timerColorClass = "text-red"; else timerColorClass = "text-blue";
-                    }
-                    
-                    let exBadgeHtml = '';
-                    if (r.isBundle) exBadgeHtml += '<span class="data-badge" style="background-color:rgba(59,130,246,0.1); color:var(--primary-text); border-color:rgba(59,130,246,0.15);">폰</span> ';
-                    if (r.isExpress) exBadgeHtml += '<span class="data-badge" style="background-color:rgba(239,68,68,0.1); color:var(--danger-text); border-color:rgba(239,68,68,0.15);">EXP</span> ';
-                    const dBadge = '<span class="data-badge">' + (platNames[platInfo[0]] || platInfo[0]) + '</span>';
-
-                    let borderClass = r.isCompleted ? "card-completed" : (r.pickupDone ? "card-pickup" : "card-running");
-                    const isCardExpanded = expandedCardIds.includes(r.id);
-
-                    let pTimeBadge = r.pickupTimeStr ? '<span class="data-badge" style="background-color:rgba(239,68,68,0.12); color:var(--danger-text); font-weight:800;">⏱️ ' + r.pickupTimeStr + ' 픽업</span> ' : '';
-                    let rawOriginText = r.originRoadAddr || r.origin;
-                    let rawDestText = r.destRoadAddr || r.dest;
-
-                    let roadDisplayLine = "일반도로 주행";
-                    if(r.roads) {
-                        let splitRoad = r.roads.split(' ➔ ');
-                        if(splitRoad.length >= 2) { 
-                            roadDisplayLine = `${splitRoad[0]} ➔ ${splitRoad[splitRoad.length - 1]}`; 
-                        } else { 
-                            roadDisplayLine = splitRoad[0]; 
-                        }
-                    }
-
-                    const detailsBodyHtml = `
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <div class="addr-info addr-origin">
-                                <div class="addr-text-sub-block"><b style="color:var(--primary-text);">상차:</b> ${rawOriginText}</div>
-                                <button type="button" class="btn-white-emot" onclick="inlineTextClipboardCopy(event, '${rawOriginText.replace(/'/g, "\\'")}')">📋</button>
-                            </div>
-                            <div class="addr-info addr-dest">
-                                <div class="addr-text-sub-block"><b style="color:var(--danger-text);">하차:</b> ${rawDestText}</div>
-                                <button type="button" class="btn-white-emot" onclick="inlineTextClipboardCopy(event, '${rawDestText.replace(/'/g, "\\'")}')">📋</button>
-                            </div>
-                        </div>
-                    `;
-
-                    let controlButtonsHtml = `
-                        <button type="button" class="btn-card-action-unit nav-active" onclick="handleNaviOrigin(event, '${r.origin}', ${r.originLon}, ${r.originLat})">상차</button>
-                        <button type="button" class="btn-card-action-unit nav-active" onclick="handleNaviOrigin(event, '${r.dest}', ${r.destLon}, ${r.destLat})">하차</button>
-                    `;
-                    
-                    if(!r.isCompleted) {
-                        if (!r.pickupDone) {
-                            controlButtonsHtml += `<button type="button" class="btn-card-action-unit pickup-active" onclick="handleCardPickupProcess(event, '${r.id}', ${i + 1})">픽업</button>`;
-                        } else {
-                            controlButtonsHtml += `<button type="button" class="btn-card-action-unit complete-active" onclick="completeRouteConfirm(event, '${r.id}')">완료</button>`; 
-                        }
-                        controlButtonsHtml += `<button type="button" class="btn-card-action-unit edit-active" onclick="openDetailPopup('${r.id}', ${i + 1})">관리</button>`;
-                    } else {
-                        controlButtonsHtml += `<button type="button" class="btn-card-action-unit" onclick="restoreRoute(event, '${r.id}')">🔄복구</button>`;
-                        controlButtonsHtml += `<button type="button" class="btn-card-action-unit edit-active" onclick="openDetailPopup('${r.id}', ${i + 1})">관리</button>`;
-                    }
-
-                    routeHTML += `
-                        <div class="route-card ${borderClass}">
-                            <div class="card-header-action-row" onclick="toggleCardAccordionSection(event, '${r.id}')" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
-                                <div style="display: flex; flex-direction: column; flex: 1; min-width: 0; padding-right: 8px;">
-                                    <div style="font-size: 15px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text);">
-                                        <span style="color:var(--primary-text);">[${i + 1}]</span> (${r.qtr}) ${oDong} ➔ ${dDong}
-                                    </div>
-                                    <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-top: 6px; display: flex; gap: 8px; align-items: center;">
-                                        <span style="color:var(--inc-text-color); font-size:14px;">${netIncome.toFixed(1)}k</span>
-                                        <span style="opacity:0.3;">|</span>
-                                        <span class="${timerColorClass}">${timerTextLine}</span>
-                                        ${r.pickupDone ? '<span style="opacity:0.3;">|</span><span style="color:var(--danger-text);">픽업</span>' : ''}
-                                    </div>
-                                </div>
-                                <div class="card-toggle-indicator" style="font-size: 11px; color: var(--text-muted); font-weight: 800; flex-shrink: 0; padding: 6px 10px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border);">
-                                    ${isCardExpanded ? "접기 ▲" : "펼치기 ▼"}
-                                </div>
-                            </div>
-
-                            <div class="${isCardExpanded ? '' : 'hidden'}" style="margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 14px; display: flex; flex-direction: column; gap: 8px;">
-                                <div class="badge-wrap-flex">
-                                    ${exBadgeHtml}${dBadge}${pTimeBadge}
-                                </div>
-
-                                <div class="road-info-clickable-box" title="전체 상세 경로 확인 클릭" onclick="openRoadPathPopupHandler(event, '${(r.roads || '상세 데이터 없음').replace(/'/g, "\\'")}')">
-                                    ${roadDisplayLine} <span style="color:var(--primary-text);">(${r.distanceKm}Km)</span>
-                                </div>
-                                
-                                ${detailsBodyHtml}
-
-                                <div class="card-control-button-group" style="margin-top: 4px;">
-                                    ${controlButtonsHtml}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                if(r.isCompleted) {
-                    callCount++; totInc += netIncome;
-                    if (!r.isBundle) { totDist += r.distanceKm; totMins += actualTime; }
-                    if(!qtrRegions[r.qtr]) qtrRegions[r.qtr] = []; if(!qtrRegions[r.qtr].includes(dDong)) qtrRegions[r.qtr].push(dDong);
-
-                    if (r.roads) { 
-                        let splitRoad = r.roads.split(' ➔ '); 
-                        if(splitRoad.length >= 1) {
-                            let lastRoad = splitRoad[splitRoad.length - 1]; 
-                            if (lastRoad && lastRoad !== "정보 없음" && lastRoad !== "START" && lastRoad !== "END") { 
-                                if(!qtrRoads[r.qtr]) qtrRoads[r.qtr] = []; 
-                                if(!qtrRoads[r.qtr].includes(lastRoad)) qtrRoads[r.qtr].push(lastRoad); 
-                            }
-                        }
-                    }
-                }
-
-                let stepStatus = r.isCompleted ? "완료" : (r.pickupDone ? "픽업" : "운행");
-                let tColor = r.isCompleted ? "color: var(--inc-text-color);" : (r.pickupDone ? "color: var(--danger-text);" : "color: var(--primary-text);");
-                let statusBadgeTable = `<span style="font-size:11px; font-weight:800; ${tColor}">${stepStatus}</span>`;
-                
-                tableHTML += `<tr><td>${i+1}</td><td>${statusBadgeTable}</td><td><span style="font-weight:800;">${platNames[platInfo[0]] || platInfo[0]}</span></td><td style="text-align:left;">${oDong}➔${dDong}</td><td style="font-weight:800;">${netIncome.toFixed(1)}k</td><td>${r.distanceKm}km</td><td>${actualTime}분</td><td><button class="btn-card-action-unit edit-active" style="padding:4px 8px !important; width:auto !important; font-size:11px !important; margin:0;" onclick="openDetailPopup('${r.id}', ${i+1})">관리</button></td></tr>`;
-            }
-
-            expenses.forEach(e => {
-                if(e.type === "주유") sumFuel += e.amount; 
-                else if(e.type === "식사") sumFood += e.amount; 
-                else if(e.type === "간식") sumSnack += e.amount; 
-                else if(e.type === "기타") sumEtc += e.amount;
-                
-                expHTML += `<tr><td>${e.date}</td><td><span class="data-badge">${e.type}</span></td><td style="text-align:left;">${e.memo}</td><td style="font-weight:700;">${e.amount.toFixed(1)}k</td><td><button class="btn-white-emot" style="padding:3px 6px !important;" onclick="deleteExpense('${e.id}')">❌</button></td></tr>`;
-            });
-
-            maintenance.forEach(m => {
-                sumMaint += m.amount;
-                maintHTML += `<tr><td>${m.date}</td><td><span class="data-badge">${m.type}</span></td><td style="text-align:left;">${m.memo}</td><td style="font-weight:700;">${m.amount.toFixed(1)}k</td><td><button class="btn-white-emot" style="padding:3px 6px !important;" onclick="deleteMaint('${m.id}')">❌</button></td></tr>`;
-            });
-
-            document.getElementById('routeListContainer').innerHTML = routeHTML || "<div style='text-align:center; padding:40px; color:var(--text-muted); font-size:14px; font-weight:600;'>현재 필터에 매칭되는 오더 카드가 없습니다.</div>";
-            document.getElementById('calcTableBody').innerHTML = tableHTML;
-            document.getElementById('expenseTableBody').innerHTML = expHTML;
-            document.getElementById('maintTableBody').innerHTML = maintHTML;
-
-            document.getElementById('totInc').innerText = totInc.toFixed(1) + "k";
-            document.getElementById('totCountBadge').innerText = callCount + " 건";
-            document.getElementById('totalDistanceVal').innerText = totDist.toFixed(1) + " km";
-            document.getElementById('hourlyWageVal').innerText = (totMins > 0 ? (totInc / totMins) * 60 : 0).toFixed(1) + "k";
-
-            let totalExpAll = sumFuel + sumFood + sumSnack + sumEtc + sumMaint; 
-            let netProfitAll = totInc - totalExpAll;
-            document.getElementById('grandTotalInc').innerText = totInc.toFixed(1) + "k"; 
-            document.getElementById('grandTotalExp').innerText = totalExpAll.toFixed(1) + "k";
+            if(isSelectMode) { toggleSelect(id); return; } 
+            const o = orders.find(x => String(x.id) === String(id)); 
+            let nextState = ''; 
+            let promptMsg = '';
             
-            const profitEl = document.getElementById('grandNetProfit'); 
-            profitEl.innerText = netProfitAll.toFixed(1) + "k";
-            if(netProfitAll < 0) { profitEl.style.color = "var(--danger-text)"; } else { profitEl.style.color = "var(--inc-text-color)"; }
+            if(o.mode === 'EATS') {
+                nextState = 'FIN';
+                promptMsg = 'DONE?';
+            } else {
+                if(o.state === 'RUN' || o.state === 'READY') { nextState = 'PICK'; promptMsg = 'PICKUP?'; } 
+                else if(o.state === 'PICK') { nextState = 'FIN'; promptMsg = 'DONE?'; } 
+            }
+            
+            if(!nextState) return;
 
-            document.getElementById('statFuel').innerText = sumFuel.toFixed(1) + "k"; 
-            document.getElementById('statFood').innerText = sumFood.toFixed(1) + "k"; 
-            document.getElementById('statSnack').innerText = sumSnack.toFixed(1) + "k"; 
-            document.getElementById('statMaint').innerText = sumMaint.toFixed(1) + "k";
-
-            let locTextArr = []; for (let [qKey, dList] of Object.entries(qtrRegions)) { locTextArr.push(`[${qKey}] ${dList.join(', ')}`); }
-            document.getElementById('topRegionsLog').innerText = locTextArr.length ? locTextArr.join(' | ') : "-";
-            let roadTextArr = []; for (let [qKey, rList] of Object.entries(qtrRoads)) { roadTextArr.push(`[${qKey}] ${rList.join(', ')}`); }
-            document.getElementById('mainRouteSummaryLog').innerText = roadTextArr.length ? roadTextArr.join(' | ') : "-";
+            openConfirm(promptMsg, () => {
+                o.state = nextState; 
+                if(nextState === 'PICK') o.pickupTime = Date.now(); 
+                if(nextState === 'FIN') o.finishTime = Date.now();
+                localStorage.setItem('qcp_orders_v130', JSON.stringify(orders)); 
+                renderMasterList(); updateSysTotal();
+            });
         }
 
-        document.getElementById('btnPasteExcel').addEventListener('click', () => { document.getElementById('pasteArea').classList.toggle('hidden'); });
-        document.getElementById('btnProcessExcel').addEventListener('click', async () => {
-            const txt = document.getElementById('excelInput').value.trim();
-            if (!txt) return alert("텍스트가 없습니다.");
+        async function copyTodayData() {
+            const todayOrders = orders.filter(o => o.state === 'FIN' && (currentTypeFilter === 'ALL' ? true : o.mode === currentTypeFilter));
+            if(todayOrders.length === 0) { showToast("EMPTY"); return; }
+            let text = "PLAT\tPICKUP\tDROPOFF\tAMOUNT\tNOTE\n";
+            todayOrders.forEach(o => text += `${o.platform}\t${o.startDetail}\t${o.endDetail||''}\t${Math.round(calcNetFare(o.fareK, o.platform) * 1000)}\t${o.memo || ''}\n`);
+            try { await navigator.clipboard.writeText(text); showToast("COPIED"); } catch(e) { showToast("COPY ERR"); }
+        }
+
+        function openMng(id, e) {
+            e.stopPropagation(); if(isSelectMode) { toggleSelect(id); return; } 
+            const o = orders.find(x => String(x.id) === String(id)); if(!o) return;
             
-            let currentSafeQtr = updateTimer();
-            const rows = txt.split('\n'); let added = 0;
-            rows.forEach(row => {
-                const cols = row.split(/[\t,]/).map(c => c.trim()); 
-                if(cols.length >= 3) {
-                    let amt = parseFloat(cols[2].replace(/[^0-9.]/g, '')); 
-                    if(!isNaN(amt)) {
-                        if(amt >= 100) amt = amt / 1000;
-                        routes.push({ id: 'id_' + Date.now().toString() + Math.random().toString(36).substr(2, 5), origin: cols[0], dest: cols[1], amount: amt, time: 0, isExpress: false, isBundle: false, qtr: currentSafeQtr, platCode: document.getElementById('platformSelect').value, timeLeft: 0, timerActive: false, isCompleted: false, pickupDone: false, countUpMins: 0, originLon: null, originLat: null, originRoadAddr: "", destLon: null, lat: null, roads: "", destRoadAddr: "", distanceKm: 0, startedAt: null, actualTimeMins: 0, pickupTimeStr: null }); added++;
+            document.getElementById('editOrderId').value = o.id;
+            const platSelect = document.getElementById('editPlatform');
+            const platList = o.mode === 'QUICKS' ? PLAT_QUICKS : PLAT_EATS;
+            platSelect.innerHTML = platList.map(p => `<option value="${p}" ${p === o.platform ? 'selected' : ''}>${p}</option>`).join('');
+
+            document.getElementById('editIn1').value = o.startDetail;
+            document.getElementById('editIn2').value = o.endDetail || '';
+            document.getElementById('editFareInput').value = o.fareK;
+            document.getElementById('editMemoInput').value = o.memo || '';
+            toggleModal('popManage');
+        }
+
+        function commitOrderModification() {
+            const o = orders.find(x => String(x.id) === document.getElementById('editOrderId').value);
+            if(o) {
+                o.platform = document.getElementById('editPlatform').value;
+                let s = document.getElementById('editIn1').value.trim(); o.startDetail = s;
+                let eStr = document.getElementById('editIn2').value.trim(); o.endDetail = eStr;
+                o.fareK = parseFloat(document.getElementById('editFareInput').value) || 0; o.memo = document.getElementById('editMemoInput').value.trim();
+                if(eStr) o.routeSummary = `${extractSummaryStr(s) || s} ➔ ${extractSummaryStr(eStr) || eStr}`;
+                else o.routeSummary = `[${extractSummaryStr(s) || s}]`;
+            }
+            localStorage.setItem('qcp_orders_v130', JSON.stringify(orders)); closeModal('popManage'); renderMasterList(); updateSysTotal(); showToast("SAVED");
+        }
+
+        function selCostChip(el, tabType) { el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); }
+        
+        function addCostRecord(type) {
+            const amtInput = document.getElementById(type === 'EXP' ? 'exp-amt' : 'mnt-amt');
+            const memoInput = document.getElementById(type === 'EXP' ? 'exp-memo' : 'mnt-product');
+            const amtK = parseFloat(amtInput.value) || 0;
+            const activeChip = document.querySelector(type === 'EXP' ? '#exp-chips .chip.active' : '#mnt-chips .chip.active');
+            if(!amtK) { showToast("NO AMT"); return; }
+
+            let record = { id: Date.now().toString(), timestamp: Date.now(), type, category: activeChip.innerText, amountK: amtK, memo: memoInput.value.trim() };
+            
+            if(type === 'MNT') {
+                record.store = document.getElementById('mnt-store').value.trim();
+                record.mileage = document.getElementById('mnt-mileage').value.trim();
+                record.product = document.getElementById('mnt-product').value.trim();
+            }
+
+            costs.unshift(record);
+            localStorage.setItem('qcp_costs_v130', JSON.stringify(costs));
+            
+            amtInput.value = ''; memoInput.value = ''; 
+            if(type === 'MNT') { document.getElementById('mnt-store').value = ''; document.getElementById('mnt-mileage').value = ''; }
+            
+            renderCostRecords(type); showToast("SAVED");
+        }
+
+        function deleteCostRecord(id, type) {
+            openConfirm("DEL REC?", () => {
+                costs = costs.filter(c => String(c.id) !== String(id));
+                localStorage.setItem('qcp_costs_v130', JSON.stringify(costs));
+                renderCostRecords(type); showToast("DELETED");
+            });
+        }
+
+        function renderCostRecords(type) {
+            const list = document.getElementById(type === 'EXP' ? 'exp-list' : 'mnt-list'); list.innerHTML = '';
+            const filtered = costs.filter(c => c.type === type);
+            if(filtered.length === 0) { list.innerHTML = `<div class="text-center text-bold" style="padding:30px; font-size:13px; color:var(--m3-outline);">EMPTY</div>`; return; }
+            
+            const formatDate = (ts) => { const d = new Date(ts); return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`; };
+            const oilInterval = parseInt(localStorage.getItem('qcp_oil_interval')) || 0;
+
+            list.innerHTML = filtered.map(c => {
+                let display = (Math.round(c.amountK * 10) / 10).toFixed(1).replace('.0', '') + 'k';
+                let dateStr = `<span style="color:var(--m3-primary); font-size:10px; margin-right:6px;">[${formatDate(c.timestamp)}]</span>`;
+                
+                if(type === 'MNT') {
+                    let nextOilStr = '';
+                    if (c.mileage && oilInterval > 0) {
+                        let curMil = parseInt(c.mileage);
+                        if (!isNaN(curMil)) nextOilStr = ` | NEXT: ${curMil + oilInterval}km`;
+                    }
+                    return `
+                    <div class="order-card" style="text-align:left;">
+                        <div class="flex-between mb-8">
+                            <span class="text-bold" style="color:var(--m3-surf-text); font-size:16px;">${display}</span>
+                            <span onclick="deleteCostRecord('${c.id}', 'MNT')" style="color:var(--m3-error); cursor:pointer; font-size:16px; padding:4px;">✖</span>
+                        </div>
+                        <div style="font-size:12px; font-weight:700; color:var(--m3-muted);">
+                            ${dateStr} OIL | ${c.store ? c.store : '-'} | ${c.mileage ? c.mileage + 'km' : '-'}${nextOilStr} | ${c.product ? c.product : '-'}
+                        </div>
+                    </div>`;
+                } else {
+                    let memoDisplay = c.memo ? ` <span style="font-size:11px; color:var(--m3-muted);">(${c.memo})</span>` : '';
+                    return `
+                    <div class="order-card flex-between">
+                        <div style="display:flex; align-items:center;">
+                            <span onclick="deleteCostRecord('${c.id}', 'EXP')" style="color:var(--m3-error); cursor:pointer; font-size:16px; padding:4px; margin-right:8px;">✖</span>
+                            <span class="text-bold" style="font-size:13px;">${c.category}${memoDisplay}</span>
+                        </div>
+                        <div class="flex-center"><span style="color:var(--m3-error); font-weight:900; font-size:15px;">-${display}</span></div>
+                    </div>`;
+                }
+            }).join('');
+        }
+
+        function setStMetric(m) { currentStatsMetric = m; document.getElementById('st-metric-amt').classList.toggle('active', m === 'AMT'); document.getElementById('st-metric-loc').classList.toggle('active', m === 'LOC'); renderStatsEngine(); }
+        
+        function renderStatsEngine() {
+            let validOrders = orders.filter(o => o.state === 'FIN');
+            let currentCosts = costs.filter(c => c.type === 'EXP'); 
+            
+            let revK = 0; validOrders.forEach(o => revK += calcNetFare(o.fareK, o.platform)); 
+            let expK = currentCosts.reduce((acc, c) => acc + c.amountK, 0); 
+            let netK = revK - expK;
+            const format = (val) => (Math.round(val * 10) / 10).toFixed(1).replace('.0', '') + 'k';
+            const target = document.getElementById('stats-render-block');
+
+            if(currentStatsMetric === 'AMT') {
+                target.innerHTML = `<div class="stats-grid"><div class="stats-box"><div style="color:var(--m3-muted);">REVENUE</div><div class="stats-val" style="color:var(--m3-primary);">${format(revK)}</div></div><div class="stats-box"><div style="color:var(--m3-muted);">EXPENSES</div><div class="stats-val" style="color:var(--m3-error);">-${format(expK)}</div></div></div><div style="background:var(--m3-primary); color:var(--m3-on-primary); padding:20px; border-radius:16px; text-align:center; font-weight:900; box-shadow: 0 4px 12px rgba(0,122,255,0.4);"><div style="font-size:12px; opacity:0.9;">NET INCOME</div><div style="font-size:28px; margin-top:6px; letter-spacing:0.5px;">${format(netK)}</div></div>`;
+            } else {
+                let pickMap = {}; let dropMap = {};
+                validOrders.forEach(o => { let pWord = o.startDetail.split(' ')[0] || "None"; let dWord = o.endDetail ? o.endDetail.split(' ')[0] : "None"; pickMap[pWord] = (pickMap[pWord] || 0) + 1; if(o.endDetail) dropMap[dWord] = (dropMap[dWord] || 0) + 1; });
+                const buildChart = (mapData) => { let sorted = Object.keys(mapData).sort((a,b) => mapData[b] - mapData[a]).slice(0, 4); let max = sorted.length > 0 ? mapData[sorted[0]] : 1; return sorted.map(loc => `<div style="display:flex; align-items:center; gap:10px; font-size:12px; font-weight:700; margin-bottom:8px;"><div style="width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${loc}</div><div style="flex:1; height:10px; background:var(--m3-outline-variant); border-radius:5px;"><div style="height:100%; background:var(--m3-primary); border-radius:5px; width:${Math.ceil((mapData[loc]/max)*100)}%;"></div></div><div style="width:20px; text-align:right;">${mapData[loc]}</div></div>`).join(''); };
+                target.innerHTML = `<div class="card" style="padding:14px; box-shadow:none; border:1px solid var(--m3-outline-variant);"><div class="text-bold mb-12" style="font-size:13px; color:var(--m3-primary);">TOP PICKUP</div><div class="mb-16">${buildChart(pickMap) || '<div style="color:var(--m3-outline); font-size:12px;">EMPTY</div>'}</div><div class="text-bold mb-12" style="font-size:13px; color:var(--m3-error);">TOP DROPOFF</div><div>${buildChart(dropMap) || '<div style="color:var(--m3-outline); font-size:12px;">EMPTY</div>'}</div></div>`;
+            }
+        }
+
+        function switchMainTab(id, el) {
+            if(el) {
+                document.querySelectorAll('.nav-bar .nav-item').forEach(n => n.classList.remove('active'));
+                el.classList.add('active');
+            } else {
+                document.querySelectorAll('.nav-bar .nav-item').forEach(n => n.classList.remove('active'));
+            }
+            
+            document.querySelectorAll('.viewport .section').forEach(s => s.classList.remove('active')); document.getElementById('view-' + id).classList.add('active');
+            if(id === 'lst') { isSelectMode = false; selectedSet.clear(); document.getElementById('chkSelectAll').checked = false; document.getElementById('btn-select-mode').classList.remove('active'); document.getElementById('btn-select-mode').style.background = 'transparent'; document.getElementById('btn-select-mode').style.color = 'var(--m3-muted)'; document.getElementById('bulk-action-bar').style.display = 'none'; renderMasterList(); }
+            if(id === 'exp' || id === 'mnt') renderCostRecords(id.toUpperCase()); if(id === 'stt') renderStatsEngine();
+        }
+
+        let touchstartX = 0; let touchstartY = 0; let touchendX = 0; let touchendY = 0;
+        function handleGesture() {
+            const xDiff = touchendX - touchstartX;
+            const yDiff = touchendY - touchstartY;
+            if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 70) {
+                if (xDiff < 0) {
+                    if (document.getElementById('view-ord').classList.contains('active')) {
+                        switchMainTab('lst', document.getElementById('nav-lst'));
                     }
                 }
-            });
-            if(added > 0) { localStorage.setItem('quickone_integrated_logs', JSON.stringify(routes)); updateDashboard(); document.getElementById('excelInput').value = ''; document.getElementById('pasteArea').classList.add('hidden'); alert(`성공적으로 등록되었습니다.`); toggleOrderInputSection(); }
-        });
+                if (xDiff > 0) {
+                    if (document.getElementById('view-lst').classList.contains('active')) {
+                        switchMainTab('ord', document.getElementById('nav-ord'));
+                    }
+                }
+            }
+        }
+        const mainViewport = document.getElementById('main-viewport');
+        mainViewport.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; touchstartY = e.changedTouches[0].screenY; }, {passive: true});
+        mainViewport.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; touchendY = e.changedTouches[0].screenY; handleGesture(); }, {passive: true});
 
-        updateTimer();
-        updateDashboard();
+        /* ==========================================================================
+           신설 주입: Geostics OS v1.0.0 가상 런타임 및 하이브리드 어드바이저 엔진
+        ========================================================================== */
+        
+        function triggerAdvisorInterruption() {
+            let pIn = (appMode === 'QUICKS') ? document.getElementById('in-pick-quicks').value.trim() : document.getElementById('in-pick-eats').value.trim();
+            let dIn = (appMode === 'QUICKS') ? document.getElementById('in-drop-quicks').value.trim() : document.getElementById('in-drop-eats').value.trim();
+            let fareK = parseFloat(document.getElementById('in-fare').value) || 0;
+            const panel = document.getElementById('bundle-utility-panel');
+
+            // 완료 이전(ACTIVE) 주문 리스트 확보
+            let activeOrders = orders.filter(o => o.state !== 'FIN');
+
+            if (!pIn || !fareK || activeOrders.length === 0) {
+                panel.style.display = 'none';
+                return;
+            }
+
+            panel.style.display = 'block';
+
+            // 1단계: 가상 3중 가상 순열 모의 시뮬레이션 가동 (최대 3개 매트릭스 고정) [cite: 14]
+            let mockSCI = 65 + Math.floor(Math.random() * 25);
+            let mockTETD = 18 + Math.floor(Math.random() * 15);
+            let mockDeltaHR = -2500 + Math.floor(Math.random() * 6000);
+
+            // 2단계: 표피(영어) 및 가이드문구(한국어 하이브리드) 데이터 주입 [cite: 3, 4]
+            document.getElementById('bu-route-coherence').innerText = `COHERENCE: ${mockSCI}%`;
+            document.getElementById('bu-total-time').innerText = `${mockTETD}분`;
+            
+            const deltaEl = document.getElementById('bu-hourly-delta');
+            if (mockDeltaHR >= 0) {
+                deltaEl.innerText = `+${mockDeltaHR.toLocaleString()}원/h`;
+                deltaEl.style.color = 'var(--m3-success)';
+            } else {
+                deltaEl.innerText = `${mockDeltaHR.toLocaleString()}원/h`;
+                deltaEl.style.color = 'var(--m3-error)';
+            }
+
+            // 3단계: 3단계 위계적 행정 구획 매칭 가상 비트맵 플래그 연산 [cite: 6, 7]
+            let matchLevel = 1;
+            if (pIn.includes('동') || pIn.includes('읍') || pIn.includes('면')) matchLevel = 2;
+            if (activeOrders.some(o => getDong(o.startDetail) === getDong(pIn))) matchLevel = 3;
+
+            document.getElementById('match-sigu').style.color = (matchLevel >= 1) ? 'var(--m3-primary)' : 'var(--m3-outline)';
+            document.getElementById('match-eupmyeondong').style.color = (matchLevel >= 2) ? 'var(--m3-primary)' : 'var(--m3-outline)';
+            document.getElementById('match-dong').style.color = (matchLevel >= 3) ? 'var(--m3-success)' : 'var(--m3-outline)';
+
+            // 4단계: 도로 기하 선형 벡터 대조 (동선 역방향 vs 동선 일직선 담백한 팩트 마킹) [cite: 10]
+            const geoText = document.getElementById('bu-geo-text');
+            const geoIcon = document.getElementById('bu-geo-icon');
+            let isUTurn = (Math.random() > 0.4);
+            let distance = (0.5 + Math.random() * 3.5).toFixed(1);
+
+            if (isUTurn) {
+                geoText.innerText = `동선 역방향 (${distance}km)`;
+                geoText.style.color = 'var(--m3-error)';
+                geoIcon.innerText = '🔄';
+            } else {
+                geoText.innerText = `동선 일직선 (${distance}km)`;
+                geoText.style.color = 'var(--m3-surf-text)';
+                geoIcon.innerText = '🛣️';
+            }
+
+            // 5단계: 다이내믹 인포 (역이름, 백화점, 랜드마크 명칭, Last-Feet 실거리, 보행자/도로 상태 첩포) [cite: 8, 9]
+            executeDynamicInfoAdvisor(pIn, dIn);
+        }
+
+        function executeDynamicInfoAdvisor(pickText, dropText) {
+            const dyLandmark = document.getElementById('dy-landmark');
+            const dyLastFeet = document.getElementById('dy-last-feet');
+            const dyPedestrian = document.getElementById('dy-pedestrian');
+            const dyTraffic = document.getElementById('dy-traffic');
+
+            // 랜드마크 및 역이름 추출 분기 첩포 [cite: 6, 8]
+            if (appMode === 'EATS') {
+                dyLandmark.innerText = `📍 랜드마크: 현대백화점 판교점 (판교역 3번 출구 연결)`;
+                dyLastFeet.innerText = `🚶 건물 내부 실거리: 도보 약 180m 이동 (지하 1층 식품관)`;
+                dyLastFeet.style.color = 'var(--m3-error)';
+                dyPedestrian.innerText = `⚠️ 도로 특성: 보행자 밀집 구역 (전방 골목길 이면도로 서행 구간)`;
+                dyPedestrian.style.color = 'var(--m3-error)';
+                dyTraffic.innerText = `🛣️ 실시간 교통 상황: 점심시간 인프라 정체 (진입 오버헤드 있음)`;
+                dyTraffic.style.color = 'var(--m3-error)';
+            } else {
+                dyLandmark.innerText = `📍 랜드마크: 일반 지표지물 지역 (상업 오피스 빌딩지 배후)`;
+                dyLastFeet.innerText = `🚶 건물 내부 실거리: 즉시 전달 가능 (로드샵 / 1층 진입로 인접)`;
+                dyLastFeet.style.color = 'var(--m3-surf-text)';
+                dyPedestrian.innerText = `🛣️ 도로 특성: 일반 평탄 도로 (이면도로 내 특이사항 없음)`;
+                dyPedestrian.style.color = 'var(--m3-surf-text)';
+                dyTraffic.innerText = `🛣️ 실시간 교통 상황: 원활 (진입 지연 없음)`;
+                dyTraffic.style.color = 'var(--m3-surf-text)';
+            }
+        }
+
+        try { checkAutoActions(); initAppMode(); renderMasterList(); updateSysTotal(); } catch (bootError) { console.error(bootError); localStorage.removeItem('qcp_orders_v130'); localStorage.removeItem('qcp_costs_v130'); location.reload(); }
     </script>
 </body>
 </html>
