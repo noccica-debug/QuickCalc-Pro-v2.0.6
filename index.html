@@ -128,6 +128,11 @@
         .marker-dot { width: 14px !important; height: 14px !important; border-radius: 50% !important; border: 2px solid #fff !important; box-shadow: 0 0 8px rgba(0,0,0,0.8) !important; }
         .marker-arrow { font-size: 20px; font-weight: 900; text-shadow: 0 0 4px #000; display: flex; justify-content: center; align-items: center; margin-top: -10px; margin-left: -10px; }
         
+        .custom-pulse-icon { position: relative; display: flex; justify-content: center; align-items: center; width: 14px; height: 14px; }
+        .pulse-dot { width: 14px; height: 14px; background: #3498db; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 10px rgba(52,152,219,0.8); z-index: 2; position: absolute; top:0; left:0; }
+        .pulse-ring { border: 3px solid rgba(52,152,219,0.6); border-radius: 50%; height: 34px; width: 34px; position: absolute; left: -10px; top: -10px; animation: pulsate 1.5s ease-out infinite; z-index: 1; }
+        @keyframes pulsate { 0% { transform: scale(0.3); opacity: 1; } 100% { transform: scale(1.2); opacity: 0; } }
+
         /* Modals & Nav */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 6000; padding: 20px; backdrop-filter: blur(3px); }
         .modal-overlay.show { display: flex; }
@@ -146,7 +151,7 @@
 </head>
 <body>
 
-    <div id="toast">MSG</div>
+    <div id="toast"></div>
 
     <div class="sys-bar">
         <div class="sys-left">
@@ -240,7 +245,7 @@
                 <span class="ch-label ch-w">W</span><span class="ch-label ch-e">E</span>
             </div>
             
-            <div id="radar-hud" class="radar-hud" onclick="GeosticsOS.toggleHUD()">--</div>
+            <div id="radar-hud" class="radar-hud" onclick="GeosticsOS.toggleHUD()"></div>
             <div id="gps-badge" class="gps-badge">📍 <span id="gps-text"></span> <span class="gps-road" id="gps-road"></span></div>
             
             <button class="btn-gps" onclick="GeosticsOS.fetchManualGPS()">GPS</button>
@@ -358,12 +363,12 @@
 
             toggleHUD: function() {
                 const hud = document.getElementById('radar-hud');
+                if(!hud.innerHTML) return;
                 this.hudVisible = !this.hudVisible;
                 if(this.hudVisible) {
                     hud.style.opacity = '1'; 
                 } else {
                     hud.style.opacity = '0';
-                    // Delay hiding display to allow fade out
                     setTimeout(() => { if(!this.hudVisible) hud.style.display = 'none'; }, 200);
                 }
             },
@@ -391,13 +396,13 @@
                             this.reverseGeocode(lat, lng);
                         },
                         (err) => { 
-                            let msg = "GPS ERROR";
-                            if(err.code === 1) msg = "권한 거부됨";
-                            else if(err.code === 3) msg = "신호 약함";
+                            let msg = "ERROR";
+                            if(err.code === 1) msg = "DENIED";
+                            else if(err.code === 3) msg = "TIMEOUT";
                             document.getElementById('gps-text').innerText = msg; 
                             setTimeout(() => badge.style.display = 'none', 4000);
                         },
-                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 } // Timeout extended to 15s
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
                     );
                 }
             },
@@ -428,7 +433,7 @@
                             document.getElementById('gps-text').innerText = dong;
                             document.getElementById('gps-road').innerText = road ? `(${road})` : '';
                             badge.style.display = 'block';
-                            setTimeout(() => badge.style.display = 'none', 10000); // Auto hide after 10s
+                            setTimeout(() => badge.style.display = 'none', 10000);
                         } else {
                             this.showFallbackGPS();
                         }
@@ -440,7 +445,7 @@
 
             showFallbackGPS: function() {
                 const badge = document.getElementById('gps-badge');
-                document.getElementById('gps-text').innerText = "위치 확인됨";
+                document.getElementById('gps-text').innerText = "LOCATED";
                 document.getElementById('gps-road').innerText = "";
                 badge.style.display = 'block';
                 setTimeout(() => badge.style.display = 'none', 5000);
@@ -451,6 +456,7 @@
                 this.selectedVectorId = null;
                 this.clearVectors();
                 document.getElementById('radar-hud').style.display = 'none';
+                document.getElementById('radar-hud').innerHTML = '';
                 document.getElementById('radar-quick-sel').innerHTML = '';
             },
 
@@ -487,11 +493,10 @@
                     if (o.startCoords && o.endCoords) {
                         const isSelected = this.selectedVectorId === o.id;
                         const stateTag = o.state === 'PICK' ? 'PICK' : 'RUN';
-                        const vColor = o.state === 'PICK' ? '#10b981' : '#007aff'; // Green for PICK, Blue for RUN
+                        const vColor = o.state === 'PICK' ? '#10b981' : '#007aff';
                         const opac = isSelected ? 1.0 : 0.2;
                         const w = isSelected ? 5 : 3;
 
-                        // Create Quick Selector Button
                         const btn = document.createElement('div');
                         btn.className = `q-sel-btn ${isSelected ? 'active' : ''}`;
                         btn.style.borderColor = vColor;
@@ -570,6 +575,7 @@
                     const hud = document.getElementById('radar-hud');
                     if (activeOrders.length === 0 && !hasNew) {
                         hud.style.display = 'none';
+                        hud.innerHTML = '';
                     } else {
                         hud.innerHTML = `SELECT VECTOR`;
                         hud.style.borderColor = `var(--m3-outline-variant)`;
@@ -646,7 +652,6 @@
                     const sStart = String(s.start).padStart(2,'0') + ':00';
                     const sEnd = String(s.end).padStart(2,'0') + ':00';
                     
-                    // Calc shift stats
                     let sOrders = this.orders.filter(o => o.shift === s.id && o.state === 'DONE');
                     let sK = sOrders.reduce((sum, o) => sum + this.calcNetFare(o.fareK, o.platform), 0).toFixed(1);
                     let sCnt = sOrders.length;
@@ -667,9 +672,7 @@
                 this.isStatsVisible = !this.isStatsVisible;
                 document.querySelectorAll('.shift-stats').forEach(el => {
                     el.style.display = this.isStatsVisible ? 'block' : 'none';
-                    if(this.isStatsVisible) {
-                        el.style.animation = "fadeIn 0.2s ease";
-                    }
+                    if(this.isStatsVisible) el.style.animation = "fadeIn 0.2s ease";
                 });
             },
 
@@ -809,7 +812,7 @@
                 
                 // AUTO-SEARCH Feature
                 if (this.appMode === 'QUICKS' && ((startTxt && !this.tempPick) || (endTxt && !this.tempDrop))) {
-                    showToast("AUTO SEARCHING...");
+                    showToast("SEARCHING...");
                     await this.searchTmapActive(true); // silent
                 }
                 
@@ -838,9 +841,7 @@
                 document.getElementById('flt-run').classList.toggle('active', f==='RUN'); 
                 document.getElementById('flt-done').classList.toggle('active', f==='DONE'); 
                 
-                // Sub-filter visibility
                 document.getElementById('lst-sub-filters').style.display = f === 'DONE' ? 'flex' : 'none';
-                
                 this.renderMasterList(); 
             },
 
@@ -852,15 +853,13 @@
                 this.renderMasterList();
             },
 
-            clearList: function() { if(confirm('Clear all local records?')) { this.orders = []; localStorage.setItem('qcp_orders_v201', JSON.stringify(this.orders)); this.renderMasterList(); this.updateSysTotal(); showToast("CLEARED"); } },
+            clearList: function() { if(confirm('CLEAR ALL?')) { this.orders = []; localStorage.setItem('qcp_orders_v201', JSON.stringify(this.orders)); this.renderMasterList(); this.updateSysTotal(); showToast("CLEARED"); } },
 
             renderMasterList: function() {
                 const tbody = document.getElementById('master-list-tbody'); tbody.innerHTML = '';
                 
-                // Main Filter
                 let filtered = this.orders.filter(o => this.currentFilter === 'RUN' ? o.state !== 'DONE' : o.state === 'DONE');
                 
-                // Sub Filter for DONE state
                 if (this.currentFilter === 'DONE' && this.currentSubFilter !== 'ALL') {
                     filtered = filtered.filter(o => o.mode === this.currentSubFilter);
                 }
@@ -882,7 +881,6 @@
                     
                     if(o.mode === 'QUICKS') tr.setAttribute('onclick', `QuickCal.toggleDetail('${o.id}')`);
                     
-                    // Mode Badge (Q/E)
                     let badgeHTML = '';
                     if (this.currentFilter === 'DONE' && this.currentSubFilter === 'ALL') {
                         badgeHTML = o.mode === 'QUICKS' ? `<span class="badge-q">Q</span>` : `<span class="badge-e">E</span>`;
