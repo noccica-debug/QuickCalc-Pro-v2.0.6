@@ -426,9 +426,11 @@
                     const res = await fetch(`https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=${lat}&lon=${lng}&appKey=${apiKey}&coordType=WGS84GEO&addressType=A04`);
                     const data = await res.json();
                     if(data && data.addressInfo) {
-                        const dong = data.addressInfo.legalDong || data.addressInfo.dongName || '';
-                        const road = data.addressInfo.roadName || '';
+                        const info = data.addressInfo;
+                        const dong = info.legalDong || info.adminDong || info.eup_myun || info.ri || info.city_do || '';
+                        const road = info.roadName || '';
                         const badge = document.getElementById('gps-badge');
+                        
                         if(dong) {
                             document.getElementById('gps-text').innerText = dong;
                             document.getElementById('gps-road').innerText = road ? `(${road})` : '';
