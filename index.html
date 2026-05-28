@@ -32,6 +32,7 @@
         .flex-center { display: flex; justify-content: center; align-items: center; }
         .gap-4 { gap: 4px; } .gap-8 { gap: 8px; } .gap-12 { gap: 12px; }
         .mb-8 { margin-bottom: 8px; } .mb-12 { margin-bottom: 12px; } .mb-16 { margin-bottom: 16px; } .mb-24 { margin-bottom: 24px; }
+        .mt-16 { margin-top: 16px; }
         .text-center { text-align: center; } .text-bold { font-weight: 800; }
 
         /* System Bar */
@@ -39,7 +40,8 @@
         .sys-left { display: flex; align-items: center; gap: 8px; justify-self: start; }
         .sys-mid { font-size: 18px; font-weight: 900; color: var(--m3-primary); white-space: nowrap; justify-self: center; }
         .sys-right { display: flex; align-items: center; justify-self: end; }
-        .sys-clock { font-size: 15px; font-weight: 700; color: var(--m3-surf-text); }
+        .sys-clock { font-size: 15px; font-weight: 700; color: var(--m3-surf-text); cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.2s; }
+        .sys-clock:active { background: var(--m3-surface-low); }
         .sys-qtr { background: var(--m3-primary); color: var(--m3-on-primary); padding: 3px 6px; border-radius: 6px; font-size: 10px; font-weight: 900; }
 
         /* Main Toggle */
@@ -93,8 +95,8 @@
         .detail-row td { background: var(--m3-surface-low); text-align: left; padding: 12px; font-size: 12px; }
 
         /* RADAR (Geostics Base OS 2.0.1) */
-        #view-radar { padding: 0; background: #030405; position: relative; }
-        #map { width: 100%; height: 100%; z-index: 1; background: #030405; }
+        #view-radar { padding: 0; background: #030405; }
+        #map { flex: 1; width: 100%; z-index: 1; background: #030405; position: relative; }
         
         .crosshair { position: absolute; inset: 0; pointer-events: none; z-index: 1000; }
         .ch-x { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.15); }
@@ -134,7 +136,7 @@
 
     <div class="sys-bar">
         <div class="sys-left">
-            <div class="sys-clock" id="sysClock">00:00</div>
+            <div class="sys-clock" id="sysClock" onclick="QuickCal.openTimeTable()">00:00</div>
             <div class="sys-qtr" id="sysQtrBadge">Q1</div>
         </div>
         <div class="sys-mid"><div id="sysTotalRev">0.0k</div></div>
@@ -269,6 +271,14 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="popTimeTable" onclick="if(event.target===this) toggleModal('popTimeTable')">
+        <div class="modal-body">
+            <div class="flex-between mb-16"><div class="text-bold" style="font-size:14px;">SHIFT TIMETABLE</div></div>
+            <div id="timetable-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+            <div class="flex-center mt-16"><button class="btn-core" style="width:100%; height:36px; margin:0;" onclick="toggleModal('popTimeTable')">CLOSE</button></div>
+        </div>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // ================= UI & COMMON =================
@@ -283,17 +293,34 @@
             
             if(id === 'lst') QuickCal.renderMasterList(); 
             if(id === 'radar') { 
-                GeosticsOS.init(); 
-                // PC Chrome 등에서 탭 전환 시 지도 렌더링이 먹통되는 현상을 방지 (0.3초 딜레이)
-                setTimeout(() => { if(GeosticsOS.map) GeosticsOS.map.invalidateSize(); }, 300); 
+                // 애니메이션(0.2s)이 완전히 끝나고 화면 크기가 확정된 0.3초 뒤 지도를 초기화하여 꼬임 방지
+                setTimeout(() => { 
+                    GeosticsOS.init(); 
+                    if(GeosticsOS.map) {
+                        GeosticsOS.map.invalidateSize(); 
+                        GeosticsOS.drawStoredVector(); 
+                    }
+                }, 300); 
             }
         }
+
+        // 1초 단위 시계 관리 및 자정 00:00:00 감지 트리거
+        setInterval(() => {
+            const n = new Date();
+            const h = String(n.getHours()).padStart(2,'0');
+            const m = String(n.getMinutes()).padStart(2,'0');
+            const s = String(n.getSeconds()).padStart(2,'0');
+            document.getElementById('sysClock').innerText = `${h}:${m}`;
+            
+            if (h === '00' && m === '00' && s === '00') {
+                QuickCal.autoSyncAndClear();
+            }
+        }, 1000);
         function getNowTimeString() { const n = new Date(); return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`; }
-        setInterval(() => document.getElementById('sysClock').innerText = getNowTimeString(), 1000);
 
         // ================= Geostics Base OS (RADAR MODULE) =================
         const GeosticsOS = {
-            map: null, routeVectors: [],
+            map: null, routeVectors: [], currentRoute: null,
             seoulCenter: [37.5665, 126.9780], 
             
             init: function() {
@@ -303,21 +330,33 @@
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { attribution: '' }).addTo(this.map);
                 this.map.attributionControl.setPrefix(false); 
 
-                // ResizeObserver를 통한 렌더링 오류 이중 방어
                 if (window.ResizeObserver) {
                     new ResizeObserver(() => { if (this.map) this.map.invalidateSize(); }).observe(document.getElementById('view-radar'));
                 }
             },
 
+            resetRadar: function() {
+                this.currentRoute = null;
+                this.clearVectors();
+                const hud = document.getElementById('radar-hud');
+                if(hud) hud.style.display = 'none';
+            },
+
             clearVectors: function() {
+                if(!this.map) return; // Null 방어 로직
                 this.routeVectors.forEach(v => this.map.removeLayer(v));
                 this.routeVectors = [];
             },
 
-            drawVector: function(pLat, pLng, dLat, dLng) {
-                if(!this.map) this.init();
+            storeRouteData: function(pLat, pLng, dLat, dLng) {
+                this.currentRoute = { pLat, pLng, dLat, dLng };
+            },
+
+            drawStoredVector: function() {
+                if(!this.map || !this.currentRoute) return;
                 this.clearVectors();
 
+                const { pLat, pLng, dLat, dLng } = this.currentRoute;
                 const pMarker = L.marker([pLat, pLng], { icon: L.divIcon({ className: 'marker-dot marker-p', iconSize: [14, 14] }) }).addTo(this.map);
                 const dMarker = L.marker([dLat, dLng], { icon: L.divIcon({ className: 'marker-dot marker-d', iconSize: [14, 14] }) }).addTo(this.map);
                 
@@ -379,6 +418,25 @@
             updateSysTotal: function() { let t=0; this.orders.forEach(o => t+=this.calcNetFare(o.fareK, o.platform)); document.getElementById('sysTotalRev').innerText = t.toFixed(1) + 'k'; },
             updateShiftBadge: function() { const h = new Date().getHours(); const s = this.SHIFTS.find(x => h >= x.start && h < x.end) || this.SHIFTS[0]; document.getElementById('sysQtrBadge').innerText = s.id; return s.id; },
             
+            openTimeTable: function() {
+                const listEl = document.getElementById('timetable-list');
+                listEl.innerHTML = '';
+                const currentH = new Date().getHours();
+                
+                this.SHIFTS.forEach(s => {
+                    const isActive = (currentH >= s.start && currentH < s.end);
+                    const borderStyle = isActive ? 'border: 2px solid var(--m3-primary);' : 'border: 1px solid var(--m3-outline-variant);';
+                    const sStart = String(s.start).padStart(2,'0') + ':00';
+                    const sEnd = String(s.end).padStart(2,'0') + ':00';
+                    
+                    listEl.innerHTML += `<div style="${borderStyle} padding: 12px; border-radius: 10px; background: var(--m3-surface-low); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:900; color: ${isActive ? 'var(--m3-primary)' : 'var(--m3-surf-text)'}">${s.id}</span>
+                        <span style="font-size:12px; font-weight:700; color:var(--m3-muted);">${sStart} ~ ${sEnd}</span>
+                    </div>`;
+                });
+                toggleModal('popTimeTable');
+            },
+
             applyTheme: function(theme) { document.documentElement.setAttribute('data-theme', theme); document.getElementById('meta-theme-color').setAttribute('content', theme === 'dark' ? '#111315' : '#f8f9fc'); localStorage.setItem('qcp_theme_v201', theme); },
             toggleThemeManual: function() { const t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light'; this.applyTheme(t); toggleModal('popSet'); },
             async toggleWakeLock(isSet) { if('wakeLock' in navigator) { try { if(isSet) this.wakeLockObj = await navigator.wakeLock.request('screen'); else if(this.wakeLockObj) { await this.wakeLockObj.release(); this.wakeLockObj = null; } localStorage.setItem('qcp_wakelock', isSet ? 'ON' : 'OFF'); } catch(e){} } },
@@ -429,7 +487,8 @@
                         if(data?.searchPoiInfo?.pois?.poi?.length > 0) {
                             const poi = data.searchPoiInfo.pois.poi[0];
                             let dong = poi.lowerAddrName || poi.middleAddrName || '';
-                            let fullStr = `${poi.upperAddrName} ${poi.middleAddrName} ${dong}`;
+                            // 세부 도로명(fullAddressRoad) 데이터 추출 우선 적용
+                            let fullStr = poi.newAddressList?.newAddress?.[0]?.fullAddressRoad || `${poi.upperAddrName} ${poi.middleAddrName} ${dong}`;
                             return { lat: parseFloat(poi.frontLat || poi.noorLat), lng: parseFloat(poi.frontLon || poi.noorLon), str: fullStr.trim(), dong: dong };
                         }
                     } catch(e) {} return null;
@@ -446,7 +505,7 @@
                                 startX: this.tempPick.lng, startY: this.tempPick.lat, 
                                 endX: this.tempDrop.lng, endY: this.tempDrop.lat, 
                                 reqCoordType: "WGS84GEO", resCoordType: "WGS84GEO", 
-                                searchOption: "12" // 이륜차 전용 도로 탐색 옵션
+                                searchOption: "12"
                             })
                         });
                         const routeData = await routeRes.json();
@@ -456,11 +515,16 @@
                             this.tempTime = Math.round(props.totalTime / 60); 
                             if(this.tempTime === 0) this.tempTime = 1; 
                         }
-                    } catch(e) { console.error(e); }
+                    } catch(e) {}
 
                     this.updateEffBadge();
-                    GeosticsOS.drawVector(this.tempPick.lat, this.tempPick.lng, this.tempDrop.lat, this.tempDrop.lng);
+                    // 즉시 렌더링 호출을 제거하고 좌표만 동적 캐싱 (화면 깨짐 원천 방어)
+                    GeosticsOS.storeRouteData(this.tempPick.lat, this.tempPick.lng, this.tempDrop.lat, this.tempDrop.lng);
                     GeosticsOS.updateHUD(this.tempPick.srt, this.tempDrop.srt, this.tempDist, this.tempTime, this.getHourlyRate());
+                    
+                    if(document.getElementById('view-radar').classList.contains('active')) {
+                        GeosticsOS.drawStoredVector();
+                    }
                 }
                 showToast("SYNCED");
             },
@@ -490,7 +554,7 @@
             clearInputs: function() { 
                 ['in-pick-quicks', 'in-drop-quicks', 'in-pick-eats', 'in-drop-eats', 'in-fare', 'in-memo'].forEach(id => { const el = document.getElementById(id); if(el && el.type !== 'checkbox') el.value = ''; }); 
                 this.tempPick = null; this.tempDrop = null; this.tempDist = 0; this.tempTime = 0; this.updateEffBadge();
-                GeosticsOS.clearVectors(); document.getElementById('radar-hud').style.display = 'none';
+                GeosticsOS.resetRadar();
             },
 
             commitOrder: function() {
@@ -604,6 +668,52 @@
                 let buf = "NO\tSHIFT\tPLAT\tPICKUP\tDROPOFF\tFARE\tMEMO\n";
                 buf += sorted.map(o => `${o.displayNo}\t${o.shift}\t${o.platform}\t${this.extractDong(o.startDetail)}\t${this.extractDong(o.endDetail)}\t${Math.round(this.calcNetFare(o.fareK, o.platform)*1000)}\t${o.memo||''}`).join('\n'); 
                 navigator.clipboard.writeText(buf).then(()=>showToast("COPIED")).catch(()=>showToast("COPY ERR")); 
+            },
+
+            // 자정 자동 전송 및 일방향 축적 데이터 가공 로직
+            autoSyncAndClear: async function() {
+                if (this.orders.length === 0) return;
+                const url = localStorage.getItem('qcp_url_sync');
+                if (!url) { showToast("SYNC URL REQ"); return; }
+                
+                showToast("AUTO SYNC...");
+                try {
+                    // GAS 가공 부하를 줄이기 위해 앱단에서 2자 요약 및 원화 정산 금액을 미리 매핑
+                    const payloadData = this.orders.map(o => ({
+                        displayNo: o.displayNo,
+                        shift: o.shift,
+                        platform: o.platform,
+                        pDong: o.endDetail ? o.routeSummary.split('➔')[0] : this.extractDong(o.startDetail),
+                        dDong: o.endDetail ? o.routeSummary.split('➔')[1] : '',
+                        netFare: Math.round(this.calcNetFare(o.fareK, o.platform) * 1000),
+                        memo: o.memo || ""
+                    }));
+
+                    const payload = {
+                        date: new Date().toISOString().split('T')[0],
+                        data: payloadData
+                    };
+                    
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' }, // CORS 방지 프리플라이트 우회
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const resJson = await res.json();
+                    if(resJson.result === "success") {
+                        this.orders = [];
+                        localStorage.setItem('qcp_orders_v201', JSON.stringify(this.orders));
+                        this.renderMasterList();
+                        this.updateSysTotal();
+                        showToast("SYNC & CLEARED");
+                    } else {
+                        showToast("SYNC ERR: RETRY");
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showToast("SYNC FAILED");
+                }
             }
         };
 
