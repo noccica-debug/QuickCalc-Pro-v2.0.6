@@ -51,7 +51,7 @@
 
         /* Layout & Sections */
         .viewport { flex: 1; position: relative; overflow: hidden; background: var(--m3-bg); }
-        .section { position: absolute; inset: 0; padding: 12px 16px; display: none; flex-direction: column; overflow: hidden; }
+        .section { position: absolute; inset: 0; padding: 12px 16px; display: none; flex-direction: column; overflow: hidden; min-height: 0; }
         .section.active { display: flex; animation: fadeIn 0.2s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -83,7 +83,7 @@
         .eff-badge .sub-txt { font-size: 11px; color: var(--m3-muted); font-weight: 700; margin-left: 6px; }
 
         /* LST Table (Scroll Optimizations) */
-        .list-wrapper { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px; background: var(--m3-surface); border-radius: 12px; border: 1px solid var(--m3-outline-variant); }
+        .list-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-bottom: 24px; background: var(--m3-surface); border-radius: 12px; border: 1px solid var(--m3-outline-variant); }
         #lst-summary-bar { flex-shrink: 0; background: var(--m3-primary-cont); color: var(--m3-on-primary-cont); text-align: center; font-size: 12px; font-weight: 900; padding: 10px; border-radius: 10px; margin-bottom: 8px; }
         
         .badge-q { border: 1px solid var(--m3-primary); color: var(--m3-primary); font-size: 9px; padding: 1px 3px; border-radius: 4px; font-weight: 900; margin-right: 4px; display: inline-block; margin-bottom: 2px; }
@@ -96,7 +96,7 @@
         .tbl-time { font-size: 9px; color: var(--m3-muted); margin-top: 2px; font-weight: 700; }
         .tbl-eff { font-size: 9px; color: var(--m3-primary); margin-top: 2px; font-weight: 800; }
 
-        /* Fullscreen View Component (No Scroll, Compressed) */
+        /* Fullscreen View Component */
         .fullscreen-overlay { position: fixed; inset: 0; background: var(--m3-bg); z-index: 8000; overflow: hidden; padding: 16px; display: none; flex-direction: column; will-change: transform; }
         .fullscreen-overlay.show { display: flex; animation: viewSlideUp 0.25s cubic-bezier(0.25, 0.8, 0.25, 1); }
         @keyframes viewSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -107,8 +107,8 @@
         .fs-label { font-size: 11px; font-weight: 800; color: var(--m3-muted); text-transform: uppercase; margin-bottom: 4px; }
         .fs-val { font-size: 14px; font-weight: 700; color: var(--m3-surf-text); line-height: 1.3; }
 
-        /* RADAR Layout Component */
-        #view-radar { padding: 0; background: #030405; overflow: hidden; }
+        /* MAP Layout Component */
+        #view-map { padding: 0; background: #030405; overflow: hidden; }
         #map { flex: 1; width: 100%; z-index: 1; background: #030405; position: relative; }
         
         .crosshair { position: absolute; inset: 0; pointer-events: none; z-index: 1000; }
@@ -122,12 +122,13 @@
         
         .btn-radar-float { position: absolute; right: 16px; width: 44px; height: 44px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: background 0.2s; text-transform: uppercase; line-height: 1.1; }
         
+        /* Pixel-perfect 56px intervals */
         .btn-gps { bottom: 16px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
-        .btn-multi-navi { bottom: 92px; background: var(--m3-primary); color: var(--m3-on-primary); border-color: var(--m3-primary); }
-        .btn-map-lock { bottom: 148px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
+        .btn-multi-navi { bottom: 72px; background: var(--m3-primary); color: var(--m3-on-primary); border-color: var(--m3-primary); }
+        .btn-map-lock { bottom: 128px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
         .btn-map-lock.locked { background: var(--m3-error); border-color: var(--m3-error); }
         
-        .btn-bundle { position: absolute; bottom: 92px; left: 16px; width: 44px; height: 44px; border-radius: 22px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.4); backdrop-filter: blur(4px); cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; transition: background 0.2s; line-height: 1.1; }
+        .btn-bundle { position: absolute; bottom: 72px; left: 16px; width: 44px; height: 44px; border-radius: 22px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.4); backdrop-filter: blur(4px); cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; transition: background 0.2s; line-height: 1.1; }
         .btn-bundle.active { background: var(--m3-error); border-color: var(--m3-error); }
 
         /* Quick Select Container */
@@ -220,8 +221,10 @@
                 </div>
                 
                 <div id="eats-inputs" class="map-input-group" style="display:none;">
-                    <div style="position:absolute; top:12px; right:12px;"><input type="checkbox" style="accent-color:var(--m3-primary); width:18px; height:18px;"></div>
-                    <div class="map-input-row" style="padding-right: 28px;"><input type="text" id="in-pick-eats" placeholder="PICKUP"></div>
+                    <div style="position:absolute; top:12px; right:12px;">
+                        <input type="checkbox" id="chk-pin-eats" onchange="QuickCalc.toggleEatsPin(this.checked)" style="accent-color:var(--m3-primary); width:18px; height:18px;">
+                    </div>
+                    <div class="map-input-row" style="padding-right: 28px;"><input type="text" id="in-pick-eats" placeholder="PICKUP" oninput="QuickCalc.saveEatsPinValue(this.value)"></div>
                     <div class="map-input-row"><input type="text" id="in-drop-eats" placeholder="DROPOFF"></div>
                 </div>
 
@@ -267,7 +270,7 @@
             </div>
         </div>
 
-        <div id="view-radar" class="section">
+        <div id="view-map" class="section">
             <div class="crosshair">
                 <div class="ch-x"></div><div class="ch-y"></div>
             </div>
@@ -299,7 +302,7 @@
     <div class="nav-bar">
         <div class="nav-item active" id="nav-ord" onclick="switchMainTab('ord', this)">ORD</div>
         <div class="nav-item" id="nav-lst" onclick="switchMainTab('lst', this)">LST</div>
-        <div class="nav-item" id="nav-radar" onclick="switchMainTab('radar', this)">RADAR</div>
+        <div class="nav-item" id="nav-map" onclick="switchMainTab('map', this)">MAP</div>
     </div>
 
     <div class="modal-overlay" id="popSet" onclick="if(event.target===this) toggleModal('popSet')">
@@ -312,7 +315,7 @@
             </div>
             <div class="flex-between mb-16">
                 <div class="text-bold" style="font-size:12px; color:var(--m3-muted);">DARK MODE</div>
-                <button class="btn-icon" onclick="QuickCalc.toggleThemeManual()">TOGGLE</button>
+                <input type="checkbox" id="set-darkmode" onchange="QuickCalc.toggleThemeManualCheckbox(this.checked)" style="accent-color:var(--m3-primary); transform:scale(1.2);">
             </div>
             <input type="password" id="tmap-key" class="input-box mb-8" placeholder="TMAP API KEY">
             <input type="password" id="kakao-key" class="input-box mb-8" placeholder="KAKAO API KEY (JS)">
@@ -358,23 +361,25 @@
                 <button class="btn-icon btn-red" style="width:30px; border-radius:15px; padding:0;" onclick="toggleModal('popChainCalc')">X</button>
             </div>
             <div id="bundle-timer-display" style="font-size:11px; text-align:center; color:var(--m3-primary); font-weight:900; margin-bottom:12px; display:none;">STARTED: --:--</div>
-            <div id="chain-sequence-display" style="font-size:12px; margin-bottom:12px; color:var(--m3-primary); font-weight:900; text-align:center; word-break:break-all;">SELECT ORDERS</div>
-            <div style="font-size:11px; margin-bottom:8px; color:var(--m3-muted); font-weight:700;">SELECT ACTIVE ORDERS:</div>
+            
             <div id="chain-order-list" style="max-height:150px; overflow-y:auto; margin-bottom:16px; background:var(--m3-surface-low); padding:12px; border-radius:12px; border:1px solid var(--m3-outline-variant);"></div>
-            <div class="flex-between mb-8" style="padding-top:10px; border-top:1px solid var(--m3-outline-variant);">
-                <div style="font-size:12px; color:var(--m3-muted); font-weight:800;">TOTAL NET</div>
-                <div style="text-align:right;">
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; padding-top:10px; border-top:1px solid var(--m3-outline-variant);">
+                <div>
+                    <div style="font-size:12px; color:var(--m3-muted); font-weight:800;">TOTAL NET</div>
                     <div style="font-size:18px; font-weight:900; color:#10b981;" id="chain-net-display">0.0k</div>
                     <div style="font-size:11px; font-weight:700; color:var(--m3-muted);" id="chain-kkm-display">--k/km</div>
                 </div>
+                <div style="text-align:right;">
+                    <div style="font-size:12px; color:var(--m3-muted); font-weight:800;">TOTAL DIST</div>
+                    <div style="font-size:18px; font-weight:900; color:var(--m3-primary);" id="chain-dist-display">0.0km</div>
+                    <div style="font-size:10px; color:var(--m3-muted); font-weight:700;">(STRAIGHT)</div>
+                </div>
             </div>
-            <div class="flex-between mb-16">
-                <div style="font-size:12px; color:var(--m3-muted); font-weight:800;">TOTAL DIST</div>
-                <div style="font-size:15px; font-weight:900; color:var(--m3-primary);" id="chain-dist-display">0.0km</div>
-            </div>
+
             <div class="flex-between gap-8" style="margin-bottom:8px;">
                 <button class="btn-core" style="background:var(--m3-surface-low); color:var(--m3-error); flex:0.4;" onclick="GeosticsOS.bundleReset()">B/RESET</button>
-                <button class="btn-core" style="background:var(--m3-primary); flex:0.8;" onclick="GeosticsOS.bundlePick()">B/PICK</button>
+                <button class="btn-core" style="background:var(--m3-primary-cont); color:var(--m3-on-primary-cont); flex:0.8;" onclick="GeosticsOS.bundlePick()">B/PICK</button>
                 <button class="btn-core btn-red" style="flex:0.8;" onclick="GeosticsOS.bundleDone()">B/DONE</button>
             </div>
             <button class="btn-core" style="width:100%; background:var(--m3-surface-low); color:var(--m3-surf-text);" onclick="GeosticsOS.applyChainSearch()">FIT MAP</button>
@@ -421,7 +426,7 @@
             document.getElementById('view-'+id).classList.add('active'); 
             
             if(id === 'lst') QuickCalc.renderMasterList(); 
-            if(id === 'radar') { 
+            if(id === 'map') { 
                 setTimeout(() => { 
                     GeosticsOS.init(); 
                     if(GeosticsOS.map) {
@@ -448,7 +453,7 @@
         }, 1000);
         function getNowTimeString() { const n = new Date(); return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`; }
 
-        // ================= Geostics Base OS (RADAR MODULE) =================
+        // ================= Geostics Base OS (MAP MODULE) =================
         const GeosticsOS = {
             map: null, routeVectors: [], currentRoute: null,
             seoulCenter: [37.5665, 126.9780], 
@@ -463,7 +468,7 @@
                 this.map = L.map('map', { zoomControl: false, maxBounds: bounds, minZoom: 10, maxBoundsViscosity: 1.0 }).setView(this.seoulCenter, 12);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', { attribution: '' }).addTo(this.map);
                 this.map.attributionControl.setPrefix(false); 
-                if (window.ResizeObserver) { new ResizeObserver(() => { if (this.map) this.map.invalidateSize(); }).observe(document.getElementById('view-radar')); }
+                if (window.ResizeObserver) { new ResizeObserver(() => { if (this.map) this.map.invalidateSize(); }).observe(document.getElementById('view-map')); }
             },
 
             toggleMapLock: function() {
@@ -725,7 +730,6 @@
             openChainCalcModal: function() {
                 const listEl = document.getElementById('chain-order-list');
                 listEl.innerHTML = '';
-                document.getElementById('chain-sequence-display').innerText = 'SELECT ORDERS';
                 
                 let activeOrders = QuickCalc.orders.filter(o => o.state === 'RUN' || o.state === 'PICK');
                 if(activeOrders.length === 0) {
@@ -821,19 +825,8 @@
                 this.lastCalculatedDist = distSum;
                 document.getElementById('chain-net-display').innerText = totalNet.toFixed(1) + 'k';
                 document.getElementById('chain-kkm-display').innerText = distSum > 0 ? (totalNet / distSum).toFixed(1) + 'k/km' : '--k/km';
-                document.getElementById('chain-dist-display').innerHTML = `${distSum.toFixed(1)}km <span style="font-size:10px; color:var(--m3-muted); font-weight:700;">(NET DIST / STRAIGHT)</span>`;
+                document.getElementById('chain-dist-display').innerText = `${distSum.toFixed(1)}km`;
                 
-                const seqDisplay = document.getElementById('chain-sequence-display');
-                if(seqDisplay) {
-                    if (sequence.length > 0) {
-                        seqDisplay.innerHTML = sequence.map(n => {
-                            let color = n.type === 'PICK' ? 'var(--m3-primary)' : 'var(--m3-error)';
-                            let safeName = QuickCalc.sanitize(n.name);
-                            return `<span style="color:${color}">[${n.displayNo}${n.type[0]}]${safeName}</span>`;
-                        }).join(' ➔ ');
-                    } else { seqDisplay.innerText = 'SELECT ORDERS'; }
-                }
-
                 let latlngs = sequence.map(n => [n.coords.lat, n.coords.lng]);
                 this.drawChainPolylineFromLatLngs(latlngs);
             },
@@ -1028,8 +1021,21 @@
                 try {
                     localStorage.setItem(key, data);
                 } catch(e) {
-                    SystemModal.alert("STORAGE FULL: Please clear old data.");
+                    SystemModal.alert("STORAGE FULL: PLEASE CLEAR OLD DATA.");
                     console.error("Storage Quota Exceeded", e);
+                }
+            },
+
+            toggleEatsPin: function(isChecked) {
+                localStorage.setItem('qcp_eats_pin', isChecked ? 'ON' : 'OFF');
+                if(isChecked) {
+                    this.saveEatsPinValue(document.getElementById('in-pick-eats').value);
+                }
+            },
+
+            saveEatsPinValue: function(val) {
+                if(document.getElementById('chk-pin-eats') && document.getElementById('chk-pin-eats').checked) {
+                    localStorage.setItem('qcp_eats_pin_val', val);
                 }
             },
 
@@ -1060,11 +1066,24 @@
                 
                 let themeMode = localStorage.getItem('qcp_theme_v203') || 'auto';
                 this.applyTheme(themeMode);
+                let actualTheme = themeMode === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : themeMode;
+                document.getElementById('set-darkmode').checked = actualTheme === 'dark';
+
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if(localStorage.getItem('qcp_theme_v203') === 'auto') { this.applyTheme('auto'); } });
                 
                 const wlState = localStorage.getItem('qcp_wakelock') === 'ON';
                 document.getElementById('set-wakelock').checked = wlState;
                 if(wlState) this.toggleWakeLock(true);
+
+                const isEatsPinned = localStorage.getItem('qcp_eats_pin') === 'ON';
+                const chkEats = document.getElementById('chk-pin-eats');
+                if (chkEats) {
+                    chkEats.checked = isEatsPinned;
+                    if (isEatsPinned) {
+                        const savedVal = localStorage.getItem('qcp_eats_pin_val') || '';
+                        document.getElementById('in-pick-eats').value = savedVal;
+                    }
+                }
             },
 
             loadDataSafely: function(k, def) { try { let d = localStorage.getItem(k); return d ? JSON.parse(d) : def; } catch(e) { return def; } },
@@ -1125,11 +1144,9 @@
                 document.getElementById('meta-theme-color').setAttribute('content', actualTheme === 'dark' ? '#111315' : '#f8f9fc'); 
                 localStorage.setItem('qcp_theme_v203', mode); 
             },
-            toggleThemeManual: function() { 
-                let currentMode = localStorage.getItem('qcp_theme_v203') || 'auto'; let newMode = 'dark';
-                if(currentMode === 'auto') { newMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark'; } 
-                else { newMode = currentMode === 'dark' ? 'light' : 'dark'; }
-                this.applyTheme(newMode); toggleModal('popSet'); 
+            toggleThemeManualCheckbox: function(isChecked) {
+                let newMode = isChecked ? 'dark' : 'light';
+                this.applyTheme(newMode);
             },
             async toggleWakeLock(isSet) { if('wakeLock' in navigator) { try { if(isSet) this.wakeLockObj = await navigator.wakeLock.request('screen'); else if(this.wakeLockObj) { await this.wakeLockObj.release(); this.wakeLockObj = null; } localStorage.setItem('qcp_wakelock', isSet ? 'ON' : 'OFF'); } catch(e){} } },
             factoryReset: function() { SystemModal.confirm('FACTORY RESET?', () => { localStorage.clear(); location.reload(); }); },
@@ -1158,7 +1175,8 @@
                 let match = str.match(/\(([^)]+)\)/); 
                 if(match) return match[1].trim().substring(0,2);
                 let clean = str.replace(/^(서울특별시|경기도|인천광역시|서울시|경기|서울|인천)\s+/, "").trim();
-                const match2 = clean.match(/([가-힣]+[0-9]*[동읍면리])/); if (match2) return match2[1].substring(0,2); 
+                const match2 = clean.match(/([가-힣]+[0-9]*[동읍면리])/); 
+                if (match2) return match2[1].substring(0,2); 
                 return clean.split(' ').pop().substring(0,2);
             },
 
@@ -1177,11 +1195,14 @@
                         const data = await res.json();
                         if(data?.searchPoiInfo?.pois?.poi?.length > 0) {
                             const poi = data.searchPoiInfo.pois.poi[0];
-                            let upper = poi.upperAddrName || ''; let middle = poi.middleAddrName || ''; let lower = poi.lowerAddrName || '';
                             let fullAddressRoad = poi.newAddressList?.newAddress?.[0]?.fullAddressRoad || '';
+                            let lower = poi.lowerAddrName || '';
                             let finalStr = '';
-                            if (fullAddressRoad) { finalStr = `${fullAddressRoad} (${lower})`; } 
-                            else { finalStr = `${upper} ${middle} ${lower}`.trim(); }
+                            if (fullAddressRoad) { 
+                                finalStr = `${fullAddressRoad} (${lower})`; 
+                            } else { 
+                                finalStr = `${poi.upperAddrName || ''} ${poi.middleAddrName || ''} ${lower}`.trim(); 
+                            }
                             finalStr = finalStr.replace(/\s+/g, ' ').trim();
                             
                             return { lat: parseFloat(poi.frontLat || poi.noorLat), lng: parseFloat(poi.frontLon || poi.noorLon), str: finalStr, dong: lower, fullLoc: finalStr };
@@ -1200,7 +1221,7 @@
                     } catch(e) { showToast("API ERROR"); console.error(e); }
                     this.updateEffBadge();
                     GeosticsOS.storeRouteData(this.tempPick.lat, this.tempPick.lng, this.tempDrop.lat, this.tempDrop.lng, this.tempPick.srt, this.tempDrop.srt, this.tempDist, this.tempTime, this.getHourlyRate());
-                    if(!isSilent && document.getElementById('view-radar').classList.contains('active')) { GeosticsOS.drawAllVectors(this.orders.filter(o => o.state === 'RUN' || o.state === 'PICK')); }
+                    if(!isSilent && document.getElementById('view-map').classList.contains('active')) { GeosticsOS.drawAllVectors(this.orders.filter(o => o.state === 'RUN' || o.state === 'PICK')); }
                     if(!isSilent) showToast("SYNCED");
                     return true;
                 }
@@ -1223,7 +1244,15 @@
                 if(fare) { const netFare = this.calcNetFare(fare, this.selectedPlatform); badge.innerHTML = `NET ${netFare.toFixed(1)}k | ${this.getHourlyRate()}k/h <span class="sub-txt">(${this.tempDist.toFixed(1)}km | ${this.tempTime}min)</span>`; badge.style.display = 'block'; } else { badge.style.display = 'none'; }
             },
             clearInputs: function() { 
-                ['in-pick-quicks', 'in-drop-quicks', 'in-pick-eats', 'in-drop-eats', 'in-fare', 'in-memo'].forEach(id => { const el = document.getElementById(id); if(el && el.type !== 'checkbox') el.value = ''; }); 
+                ['in-pick-quicks', 'in-drop-quicks', 'in-pick-eats', 'in-drop-eats', 'in-fare', 'in-memo'].forEach(id => { 
+                    const el = document.getElementById(id); 
+                    if(el) {
+                        if (id === 'in-pick-eats' && document.getElementById('chk-pin-eats') && document.getElementById('chk-pin-eats').checked) {
+                            return; 
+                        }
+                        if(el.type !== 'checkbox') el.value = ''; 
+                    }
+                }); 
                 this.tempPick = null; this.tempDrop = null; this.tempDist = 0; this.tempTime = 0; this.updateEffBadge(); GeosticsOS.resetRadar();
             },
 
@@ -1302,10 +1331,10 @@
                 let pickLocUrl = o.startCoords && o.startCoords.fullLoc ? o.startCoords.fullLoc : o.startDetail;
                 let dropLocUrl = o.endCoords && o.endCoords.fullLoc ? o.endCoords.fullLoc : (o.endDetail || o.startDetail);
 
-                let pShort = QuickCalc.extractDong(o.startDetail).replace(/'/g, "\'"); if(pShort) pShort += "동";
-                let pFull = pickLocUrl.replace(/'/g, "\'");
-                let dShort = o.endDetail ? QuickCalc.extractDong(o.endDetail).replace(/'/g, "\'") : 'N/A'; if(dShort !== 'N/A') dShort += "동";
-                let dFull = dropLocUrl.replace(/'/g, "\'");
+                let pShort = QuickCalc.extractDong(o.startDetail).replace(/'/g, "\\'"); 
+                let pFull = pickLocUrl.replace(/'/g, "\\'");
+                let dShort = o.endDetail ? QuickCalc.extractDong(o.endDetail).replace(/'/g, "\\'") : 'N/A'; 
+                let dFull = dropLocUrl.replace(/'/g, "\\'");
 
                 let pickTmapUrl = (o.startCoords && o.startCoords.lng && o.startCoords.lat) ? `tmap://route?goalname=${encodeURIComponent(pShort)}&goalx=${o.startCoords.lng}&goaly=${o.startCoords.lat}` : `tmap://search?name=${encodeURIComponent(pickLocUrl)}`;
                 let dropTmapUrl = (o.endCoords && o.endCoords.lng && o.endCoords.lat) ? `tmap://route?goalname=${encodeURIComponent(dShort)}&goalx=${o.endCoords.lng}&goaly=${o.endCoords.lat}` : `tmap://search?name=${encodeURIComponent(dropLocUrl)}`;
@@ -1354,7 +1383,7 @@
             stepState: function(id, nextState, e) { 
                 e.stopPropagation(); 
                 const o = this.orders.find(x => x.id === id); if(!o) return; 
-                if(o.mode === 'QUICKS') { SystemModal.confirm(`Proceed to ${nextState}?`, () => { this.executeStepState(o, nextState); }); } 
+                if(o.mode === 'QUICKS') { SystemModal.confirm(`PROCEED TO ${nextState}?`, () => { this.executeStepState(o, nextState); }); } 
                 else { this.executeStepState(o, nextState); }
             },
             
@@ -1396,11 +1425,14 @@
                         const data = await res.json();
                         if(data?.searchPoiInfo?.pois?.poi?.length > 0) {
                             const poi = data.searchPoiInfo.pois.poi[0];
-                            let upper = poi.upperAddrName || ''; let middle = poi.middleAddrName || ''; let lower = poi.lowerAddrName || '';
                             let fullAddressRoad = poi.newAddressList?.newAddress?.[0]?.fullAddressRoad || '';
+                            let lower = poi.lowerAddrName || '';
                             let finalStr = '';
-                            if (fullAddressRoad) { finalStr = `${fullAddressRoad} (${lower})`; } 
-                            else { finalStr = `${upper} ${middle} ${lower}`.trim(); }
+                            if (fullAddressRoad) { 
+                                finalStr = `${fullAddressRoad} (${lower})`; 
+                            } else { 
+                                finalStr = `${poi.upperAddrName || ''} ${poi.middleAddrName || ''} ${lower}`.trim(); 
+                            }
                             finalStr = finalStr.replace(/\s+/g, ' ').trim();
                             return { lat: parseFloat(poi.frontLat || poi.noorLat), lng: parseFloat(poi.frontLon || poi.noorLon), fullLoc: finalStr };
                         }
