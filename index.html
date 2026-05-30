@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#111315" id="meta-theme-color">
-    <title>QuickCal Pro (v2.0.3)</title>
+    <title>QuickCal Sys Pro (v2.0.3)</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         /* M3 Based Color Palette */
@@ -195,7 +195,7 @@
 
     <div class="viewport" id="main-viewport">
         <div id="view-ord" class="section active" style="overflow-y:auto;">
-            <div class="app-title">QuickCal Pro</div>
+            <div class="app-title">QuickCal Sys Pro</div>
             <div class="flex-center">
                 <div class="main-toggle">
                     <div class="main-toggle-btn active" id="btn-mode-quicks" onclick="QuickCal.setAppMode('QUICKS')">QUICKS</div>
@@ -278,7 +278,7 @@
             
             <button class="btn-radar-float btn-map-lock" id="btn-map-lock" onclick="GeosticsOS.toggleMapLock()">LOCK</button>
             <button class="btn-radar-float btn-multi-navi" onclick="GeosticsOS.executeMultiNavi()">MULTI<br>NAVI</button>
-            <button class="btn-bundle" id="btn-chain-calc" onclick="GeosticsOS.openChainCalcModal()">CHAIN<br>CALC</button>
+            <button class="btn-bundle" id="btn-chain-calc" onclick="GeosticsOS.openChainCalcModal()">BUNDLE<br>BOX</button>
             <button class="btn-radar-float btn-gps" onclick="GeosticsOS.fetchManualGPS()">GPS</button>
             <div id="radar-quick-sel" class="quick-sel-container"></div>
             
@@ -322,7 +322,7 @@
                 <button class="btn-core btn-red" onclick="QuickCal.factoryReset()">RESET</button>
                 <button class="btn-core" onclick="QuickCal.saveSystemConfig()">SAVE</button>
             </div>
-            <div class="text-center mt-16" style="font-size:10px; color:var(--m3-outline); font-weight:600;">© 2026 QuickCal Pro. All rights reserved.</div>
+            <div class="text-center mt-16" style="font-size:10px; color:var(--m3-outline); font-weight:600;">© 2026 QuickCal Sys Pro. All rights reserved.</div>
         </div>
     </div>
 
@@ -333,10 +333,7 @@
                 <button class="btn-icon btn-red" style="width:30px; border-radius:15px; padding:0;" onclick="QuickCal.deleteEditItem()">X</button>
             </div>
             <input type="hidden" id="edit-id">
-            <select id="edit-plat" class="select-box mb-12">
-                <option value="Insung">Insung</option><option value="Logi">Logi</option><option value="Kakao">Kakao</option>
-                <option value="Baemin">Baemin</option><option value="Coupang">Coupang</option>
-            </select>
+            <select id="edit-plat" class="select-box mb-12"></select>
             <input type="text" id="edit-pick" class="input-box mb-12" placeholder="PICKUP">
             <input type="text" id="edit-drop" class="input-box mb-12" placeholder="DROPOFF">
             <input type="number" step="0.1" inputmode="decimal" id="edit-fare" class="input-box mb-12" placeholder="AMT">
@@ -358,21 +355,25 @@
     <div class="modal-overlay" id="popChainCalc" onclick="if(event.target===this) toggleModal('popChainCalc')">
         <div class="modal-body">
             <div class="flex-between mb-16">
-                <div class="text-bold" style="font-size:14px; color: var(--m3-primary);">CHAIN CALCULATION</div>
+                <div class="text-bold" style="font-size:14px; color: var(--m3-primary);">BUNDLE CALCULATION</div>
                 <button class="btn-icon btn-red" style="width:30px; border-radius:15px; padding:0;" onclick="toggleModal('popChainCalc')">X</button>
             </div>
             <div id="chain-sequence-display" style="font-size:12px; margin-bottom:12px; color:var(--m3-primary); font-weight:900; text-align:center; word-break:break-all;">SELECT ORDERS</div>
             <div style="font-size:11px; margin-bottom:8px; color:var(--m3-muted); font-weight:700;">SELECT ACTIVE ORDERS:</div>
-            <div id="chain-order-list" style="max-height:180px; overflow-y:auto; margin-bottom:16px; background:var(--m3-surface-low); padding:12px; border-radius:12px; border:1px solid var(--m3-outline-variant);"></div>
+            <div id="chain-order-list" style="max-height:150px; overflow-y:auto; margin-bottom:16px; background:var(--m3-surface-low); padding:12px; border-radius:12px; border:1px solid var(--m3-outline-variant);"></div>
             <div class="flex-between mb-8" style="padding-top:10px; border-top:1px solid var(--m3-outline-variant);">
                 <div style="font-size:12px; color:var(--m3-muted); font-weight:800;">TOTAL NET</div>
                 <div style="font-size:18px; font-weight:900; color:#10b981;" id="chain-net-display">0.0k</div>
             </div>
             <div class="flex-between mb-16">
-                <div style="font-size:12px; color:var(--m3-muted); font-weight:800;">ST.DIST</div>
+                <div style="font-size:12px; color:var(--m3-muted); font-weight:800;">TOTAL DIST</div>
                 <div style="font-size:15px; font-weight:900; color:var(--m3-primary);" id="chain-dist-display">0.0km</div>
             </div>
-            <button class="btn-core" style="width:100%;" onclick="GeosticsOS.applyChainSearch()">SEARCH</button>
+            <div class="flex-between gap-12" style="margin-bottom:8px;">
+                <button class="btn-core" style="background:var(--m3-primary);" onclick="GeosticsOS.bundlePick()">B / PICK</button>
+                <button class="btn-core btn-red" onclick="GeosticsOS.bundleDone()">B / DONE</button>
+            </div>
+            <button class="btn-core" style="width:100%; background:var(--m3-surface-low); color:var(--m3-surf-text);" onclick="GeosticsOS.applyChainSearch()">FIT MAP</button>
         </div>
     </div>
 
@@ -449,7 +450,7 @@
             seoulCenter: [37.5665, 126.9780], 
             userMarker: null, selectedVectorId: null, hudVisible: true,
             chainPolyline: null, chainMarkers: [], mapLocked: false,
-            naviSelectedOrders: [], chainSelectedOrders: [],
+            naviSelectedOrders: [], chainSelectedOrders: [], bundleStartTime: null,
 
             init: function() {
                 if (this.map) return;
@@ -714,9 +715,8 @@
                 if (this.userMarker) this.userMarker.setZIndexOffset(9999);
             },
 
-            // CHAIN CALC Logic
             openChainCalcModal: function() {
-                this.chainSelectedOrders = []; // Reset Array
+                this.chainSelectedOrders = []; 
                 const listEl = document.getElementById('chain-order-list');
                 listEl.innerHTML = '';
                 document.getElementById('chain-sequence-display').innerText = 'SELECT ORDERS';
@@ -757,40 +757,80 @@
             },
 
             updateChainCalculation: function() {
-                let totalNet = 0; let distSum = 0;
-                let nodes = []; let seqNames = [];
-                
-                this.chainSelectedOrders.forEach(o => { 
-                    totalNet += QuickCal.calcNetFare(o.fareK, o.platform); 
-                    if(o.endCoords) nodes.push(o.endCoords);
-                    let dropName = o.endDetail ? (o.routeSummary.split('➔')[1] || '') : QuickCal.extractDong(o.startDetail);
-                    if(dropName) seqNames.push(dropName.trim());
-                });
-                
-                for(let i=0; i<nodes.length-1; i++) {
-                    distSum += this.calcCrow(nodes[i].lat, nodes[i].lng, nodes[i+1].lat, nodes[i+1].lng);
+                let totalNet = 0;
+                let selectedOrders = this.chainSelectedOrders;
+                selectedOrders.forEach(o => { totalNet += QuickCal.calcNetFare(o.fareK, o.platform); });
+
+                let sequence = [];
+                let distSum = 0;
+
+                if (selectedOrders.length > 0) {
+                    let unvisited = [];
+                    selectedOrders.forEach(o => {
+                        if (o.startCoords) {
+                            unvisited.push({ type: 'PICK', coords: o.startCoords, name: QuickCal.extractDong(o.startDetail), orderId: o.id, displayNo: o.displayNo });
+                        }
+                        if (o.endCoords && o.endDetail) {
+                            unvisited.push({ type: 'DROP', coords: o.endCoords, name: QuickCal.extractDong(o.endDetail), orderId: o.id, displayNo: o.displayNo });
+                        }
+                    });
+
+                    let pickedOrderIds = new Set();
+                    let currentCoords = null;
+                    if (this.userMarker) {
+                        currentCoords = this.userMarker.getLatLng();
+                    } else if (unvisited.length > 0) {
+                        currentCoords = unvisited[0].coords;
+                    }
+
+                    while (unvisited.length > 0) {
+                        let nextIdx = -1;
+                        let minDist = Infinity;
+
+                        for (let i = 0; i < unvisited.length; i++) {
+                            let node = unvisited[i];
+                            if (node.type === 'DROP' && !pickedOrderIds.has(node.orderId)) continue;
+
+                            let d = this.calcCrow(currentCoords.lat, currentCoords.lng, node.coords.lat, node.coords.lng);
+                            if (d < minDist) { minDist = d; nextIdx = i; }
+                        }
+
+                        if (nextIdx === -1) nextIdx = 0;
+
+                        let bestNode = unvisited.splice(nextIdx, 1)[0];
+                        sequence.push(bestNode);
+                        if (bestNode.type === 'PICK') pickedOrderIds.add(bestNode.orderId);
+                        distSum += minDist;
+                        currentCoords = bestNode.coords;
+                    }
                 }
 
                 document.getElementById('chain-net-display').innerText = totalNet.toFixed(1) + 'k';
-                document.getElementById('chain-dist-display').innerText = distSum.toFixed(1) + 'km';
+                document.getElementById('chain-dist-display').innerHTML = `${distSum.toFixed(1)}km <span style="font-size:10px; color:var(--m3-muted); font-weight:700;">(NET DIST / STRAIGHT)</span>`;
                 
                 const seqDisplay = document.getElementById('chain-sequence-display');
                 if(seqDisplay) {
-                    seqDisplay.innerText = seqNames.length > 0 ? seqNames.join(' ➔ ') : 'SELECT ORDERS';
+                    if (sequence.length > 0) {
+                        seqDisplay.innerHTML = sequence.map(n => {
+                            let color = n.type === 'PICK' ? 'var(--m3-primary)' : 'var(--m3-error)';
+                            return `<span style="color:${color}">[${n.displayNo}${n.type[0]}]${n.name}</span>`;
+                        }).join(' ➔ ');
+                    } else {
+                        seqDisplay.innerText = 'SELECT ORDERS';
+                    }
                 }
 
-                this.drawChainPolyline(nodes);
+                let latlngs = sequence.map(n => [n.coords.lat, n.coords.lng]);
+                this.drawChainPolylineFromLatLngs(latlngs);
             },
 
-            drawChainPolyline: function(nodes) {
+            drawChainPolylineFromLatLngs: function(latlngs) {
                 this.clearChainPolyline();
-                if(nodes.length > 1 && this.map) {
-                    const latlngs = nodes.map(n => [n.lat, n.lng]);
+                if(latlngs.length > 1 && this.map) {
                     this.chainPolyline = L.polyline(latlngs, { color: '#ff3b30', weight: 4, dashArray: '6, 8', opacity: 0.9 }).addTo(this.map);
-                    
-                    for(let i=0; i<nodes.length-1; i++) {
-                        let bearing = this.calcBearing(nodes[i].lat, nodes[i].lng, nodes[i+1].lat, nodes[i+1].lng);
-                        let midLat = (nodes[i].lat + nodes[i+1].lat)/2; let midLng = (nodes[i].lng + nodes[i+1].lng)/2;
+                    for(let i=0; i<latlngs.length-1; i++) {
+                        let bearing = this.calcBearing(latlngs[i][0], latlngs[i][1], latlngs[i+1][0], latlngs[i+1][1]);
+                        let midLat = (latlngs[i][0] + latlngs[i+1][0])/2; let midLng = (latlngs[i][1] + latlngs[i+1][1])/2;
                         let arrowIcon = L.divIcon({ className: 'marker-arrow', iconSize: [24, 24], html: `<div style="transform: rotate(${bearing - 90}deg); color: #ff3b30; font-size: 20px;">▶</div>` });
                         let m = L.marker([midLat, midLng], {icon: arrowIcon}).addTo(this.map);
                         this.chainMarkers.push(m);
@@ -798,12 +838,58 @@
                 }
             },
 
+            bundlePick: function() {
+                if (this.chainSelectedOrders.length === 0) { SystemModal.alert("SELECT ORDERS FIRST"); return; }
+                this.bundleStartTime = Date.now();
+                this.chainSelectedOrders.forEach(o => { o.state = 'PICK'; o.pTime = getNowTimeString(); });
+                localStorage.setItem('qcp_orders_v203', JSON.stringify(QuickCal.orders));
+                QuickCal.renderMasterList();
+                showToast("BUNDLE LOG STARTED");
+                toggleModal('popChainCalc');
+            },
+
+            bundleDone: function() {
+                if (!this.bundleStartTime) { SystemModal.alert("START BUNDLE FIRST (TAP B/PICK)"); return; }
+                if (this.chainSelectedOrders.length === 0) { SystemModal.alert("SELECT ORDERS FIRST"); return; }
+                
+                let elapsedMin = Math.round((Date.now() - this.bundleStartTime) / 60000);
+                if (elapsedMin === 0) elapsedMin = 1;
+                
+                let totalNet = 0;
+                let nos = [];
+                this.chainSelectedOrders.forEach(o => {
+                    totalNet += QuickCal.calcNetFare(o.fareK, o.platform);
+                    nos.push(o.displayNo);
+                    o.state = 'DONE';
+                    o.fTime = getNowTimeString();
+                });
+                
+                let kh = ((totalNet / elapsedMin) * 60).toFixed(1);
+                let newLog = { ts: Date.now(), nos: nos.sort((a,b)=>a-b).join(','), net: totalNet, elapsed: elapsedMin, kh: kh };
+                
+                let logs = QuickCal.loadDataSafely('qcp_bundle_logs_v203', []);
+                logs.unshift(newLog);
+                localStorage.setItem('qcp_bundle_logs_v203', JSON.stringify(logs));
+                localStorage.setItem('qcp_orders_v203', JSON.stringify(QuickCal.orders));
+                
+                QuickCal.updateSysTotal();
+                QuickCal.renderMasterList();
+                
+                let todayStr = new Date().toISOString().split('T')[0];
+                QuickCal.autoSyncAndClear(todayStr);
+                
+                SystemModal.alert(`BUNDLE SAVED\nNET: ${totalNet.toFixed(1)}k\nTIME: ${elapsedMin}min\nEFF: ${kh}k/h`);
+                this.bundleStartTime = null;
+                this.chainSelectedOrders = [];
+                this.clearChainPolyline();
+                toggleModal('popChainCalc');
+            },
+
             applyChainSearch: function() {
                 toggleModal('popChainCalc');
                 this.autofitActiveBounds();
             },
 
-            // MULTI NAVI Logic (Kakao max 5 points)
             executeMultiNavi: function() {
                 this.naviSelectedOrders = [];
                 this.renderNaviOrderList();
@@ -851,7 +937,7 @@
                     this.naviSelectedOrders.splice(index, 1);
                 } else {
                     if (this.naviSelectedOrders.length >= 5) {
-                        SystemModal.alert("카카오 다중 경유는 목적지 포함 최대 5곳까지만 지원됩니다.");
+                        SystemModal.alert("MAX 5 COLS SUPPORTED.");
                         return;
                     }
                     this.naviSelectedOrders.push(order);
@@ -882,8 +968,7 @@
                     if(vias) baseParams += `&vias=${vias}`;
                 }
 
-                let intentUrl = `intent://${baseParams}#Intent;scheme=kakaonavi;package=com.locnall.KimGiSa;end;`;
-
+                let intentUrl = `intent://${baseParams}#Intent;scheme=kakaonavi;package=com.locnall.KimGiSa;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.locnall.KimGiSa;end;`;
                 showToast("LAUNCHING MULTI NAVI");
                 toggleModal('popMultiNavi');
                 setTimeout(() => { window.location.href = intentUrl; }, 500);
@@ -906,12 +991,11 @@
             }
         };
 
-        // ================= QuickCal Pro (SYSTEM MODULE) =================
+        // ================= QuickCal Sys Pro (SYSTEM MODULE) =================
         const QuickCal = {
             orders: [], appMode: 'QUICKS', selectedPlatform: 'Insung',
             currentFilter: 'RUN', currentSubFilter: 'ALL', wakeLockObj: null,
             tempPick: null, tempDrop: null, tempDist: 0, tempTime: 0, isStatsVisible: false,
-            
             pressTimer: null, isLongPress: false, startY: 0,
             
             startPress: function(id, e) {
@@ -1032,7 +1116,6 @@
 
             selectPlatform: function(el, plat) { document.querySelectorAll('#platform-chips .chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); this.selectedPlatform = plat; this.updateEffBadge(); },
             
-            cleanRoadAddress: function(str) { if(!str) return ""; return str.replace(/^(서울특별시|경기도|인천광역시|강원도|충청북도|충청남도|전라북도|전라남도|경상북도|경상남도|제주특별자치도|세종특별자치시|서울시|경기|인천)\s+/, "").trim(); },
             extractDong: function(str) { 
                 if(!str) return ""; let match = str.match(/\(([가-힣]+[0-9]*[동읍면리])\)/); if(match) return match[1].substring(0,2);
                 let clean = str.replace(/^(서울특별시|경기도|인천광역시|서울시|경기|서울|인천)\s+/, "").trim();
@@ -1055,17 +1138,17 @@
                         const data = await res.json();
                         if(data?.searchPoiInfo?.pois?.poi?.length > 0) {
                             const poi = data.searchPoiInfo.pois.poi[0];
-                            let gungun = poi.middleAddrName || ''; let dong = poi.lowerAddrName || '';
-                            let roadName = poi.newAddressList?.newAddress?.[0]?.roadName || '';
-                            let bldNo = poi.newAddressList?.newAddress?.[0]?.bldNo1 || '';
-                            let roadAddr = roadName ? `${roadName} ${bldNo}`.trim() : poi.newAddressList?.newAddress?.[0]?.fullAddressRoad || '';
-                            if(!roadAddr) { roadAddr = `${poi.upperAddrName} ${gungun} ${dong}`.trim(); }
+                            let upper = poi.upperAddrName || '';
+                            let middle = poi.middleAddrName || '';
+                            let lower = poi.lowerAddrName || '';
+                            let fullAddressRoad = poi.newAddressList?.newAddress?.[0]?.fullAddressRoad || '';
                             
-                            let formattedFullStr = `${QuickCal.cleanRoadAddress(roadAddr)} (${dong})`.replace(/\s+/g, ' ');
-                            let naviLocStr = (gungun ? gungun + " " : "") + (dong ? dong + " " : "") + (roadName ? "(" + roadName + ")" : "");
-                            naviLocStr = naviLocStr.trim() || formattedFullStr;
+                            let finalStr = '';
+                            if (fullAddressRoad) { finalStr = `${fullAddressRoad} (${lower})`; } 
+                            else { finalStr = `${upper} ${middle} ${lower}`.trim(); }
+                            finalStr = finalStr.replace(/\s+/g, ' ').trim();
                             
-                            return { lat: parseFloat(poi.frontLat || poi.noorLat), lng: parseFloat(poi.frontLon || poi.noorLon), str: formattedFullStr, dong: dong, fullLoc: naviLocStr };
+                            return { lat: parseFloat(poi.frontLat || poi.noorLat), lng: parseFloat(poi.frontLon || poi.noorLon), str: finalStr, dong: lower, fullLoc: finalStr };
                         }
                     } catch(e) {} return null;
                 };
@@ -1184,9 +1267,9 @@
                 let pickLocUrl = o.startCoords && o.startCoords.fullLoc ? o.startCoords.fullLoc : o.startDetail;
                 let dropLocUrl = o.endCoords && o.endCoords.fullLoc ? o.endCoords.fullLoc : (o.endDetail || o.startDetail);
 
-                let pShort = o.startDetail.replace(/'/g, "\\'");
+                let pShort = QuickCal.extractDong(o.startDetail).replace(/'/g, "\\'"); if(pShort) pShort += "동";
                 let pFull = pickLocUrl.replace(/'/g, "\\'");
-                let dShort = (o.endDetail || 'N/A').replace(/'/g, "\\'");
+                let dShort = o.endDetail ? QuickCal.extractDong(o.endDetail).replace(/'/g, "\\'") : 'N/A'; if(dShort !== 'N/A') dShort += "동";
                 let dFull = dropLocUrl.replace(/'/g, "\\'");
 
                 content.innerHTML = `
@@ -1204,8 +1287,8 @@
                     </div>
                     <div class="fs-card fs-col-full">
                         <div class="fs-label">ROUTE <span style="text-transform:none;font-weight:400;color:var(--m3-outline); font-size:10px;">(TAP TO TOGGLE)</span></div>
-                        <div class="fs-val" style="margin-bottom:6px; cursor:pointer;" onclick="let p = this.querySelector('span'); p.innerText = p.innerText === '${pShort}' ? '${pFull}' : '${pShort}';"><strong style="color:var(--m3-primary)">PICK:</strong> <span>${o.startDetail}</span></div>
-                        <div class="fs-val" style="cursor:pointer;" onclick="let d = this.querySelector('span'); d.innerText = d.innerText === '${dShort}' ? '${dFull}' : '${dShort}';"><strong style="color:var(--m3-error)">DROP:</strong> <span>${o.endDetail || 'N/A'}</span></div>
+                        <div class="fs-val" style="margin-bottom:6px; cursor:pointer;" onclick="let p = this.querySelector('span'); p.innerText = p.innerText === '${pShort}' ? '${pFull}' : '${pShort}';"><strong style="color:var(--m3-primary)">PICK:</strong> <span>${pFull}</span></div>
+                        <div class="fs-val" style="cursor:pointer;" onclick="let d = this.querySelector('span'); d.innerText = d.innerText === '${dShort}' ? '${dFull}' : '${dShort}';"><strong style="color:var(--m3-error)">DROP:</strong> <span>${dFull}</span></div>
                     </div>
                     <div class="fs-card fs-col-full">
                         <div class="fs-label">NAVI (TMAP)</div>
@@ -1229,11 +1312,8 @@
             stepState: function(id, nextState, e) { 
                 e.stopPropagation(); 
                 const o = this.orders.find(x => x.id === id); if(!o) return; 
-                if(o.mode === 'QUICKS') { 
-                    SystemModal.confirm(`Proceed to ${nextState}?`, () => {
-                        this.executeStepState(o, nextState);
-                    });
-                } else { this.executeStepState(o, nextState); }
+                if(o.mode === 'QUICKS') { SystemModal.confirm(`Proceed to ${nextState}?`, () => { this.executeStepState(o, nextState); }); } 
+                else { this.executeStepState(o, nextState); }
             },
             
             executeStepState: function(o, nextState) {
@@ -1246,7 +1326,18 @@
             openEditModal: function(id, e) {
                 if(e) e.stopPropagation(); 
                 const o = this.orders.find(x => x.id === id); if(!o) return;
-                document.getElementById('edit-id').value = id; document.getElementById('edit-plat').value = o.platform;
+                document.getElementById('edit-id').value = id;
+
+                const platSelect = document.getElementById('edit-plat');
+                platSelect.innerHTML = '';
+                const pArr = o.mode === 'QUICKS' ? this.PLAT_QUICKS : this.PLAT_EATS;
+                pArr.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p; opt.innerText = p;
+                    platSelect.appendChild(opt);
+                });
+                platSelect.value = o.platform;
+
                 document.getElementById('edit-pick').value = o.startDetail; document.getElementById('edit-drop').value = o.endDetail || '';
                 document.getElementById('edit-fare').value = o.fareK; document.getElementById('edit-memo').value = o.memo || '';
                 toggleModal('popEdit');
@@ -1263,9 +1354,13 @@
                         const data = await res.json();
                         if(data?.searchPoiInfo?.pois?.poi?.length > 0) {
                             const poi = data.searchPoiInfo.pois.poi[0];
-                            let gungun = poi.middleAddrName || ''; let dong = poi.lowerAddrName || ''; let roadName = poi.newAddressList?.newAddress?.[0]?.roadName || '';
-                            let fullLocStr = (gungun ? gungun + " " : "") + (dong ? dong + " " : "") + (roadName ? "(" + roadName + ")" : "");
-                            return { lat: parseFloat(poi.frontLat || poi.noorLat), lng: parseFloat(poi.frontLon || poi.noorLon), fullLoc: fullLocStr.trim() };
+                            let upper = poi.upperAddrName || ''; let middle = poi.middleAddrName || ''; let lower = poi.lowerAddrName || '';
+                            let fullAddressRoad = poi.newAddressList?.newAddress?.[0]?.fullAddressRoad || '';
+                            let finalStr = '';
+                            if (fullAddressRoad) { finalStr = `${fullAddressRoad} (${lower})`; } 
+                            else { finalStr = `${upper} ${middle} ${lower}`.trim(); }
+                            finalStr = finalStr.replace(/\s+/g, ' ').trim();
+                            return { lat: parseFloat(poi.frontLat || poi.noorLat), lng: parseFloat(poi.frontLon || poi.noorLon), fullLoc: finalStr };
                         }
                     } catch(e) {} return null;
                 };
@@ -1318,24 +1413,14 @@
         };
 
         function initSwipeToCloseGesture() {
-            const overlay = document.getElementById('fullscreen-overlay');
-            const dragZone = document.getElementById('modal-drag-zone');
-            let startY = 0, currentY = 0, isTracking = false, startTime = 0;
-            const bindTargets = [dragZone, overlay];
+            const overlay = document.getElementById('fullscreen-overlay'); const dragZone = document.getElementById('modal-drag-zone');
+            let startY = 0, currentY = 0, isTracking = false, startTime = 0; const bindTargets = [dragZone, overlay];
             
             bindTargets.forEach(target => {
-                target.addEventListener('touchstart', (e) => {
-                    if(overlay.scrollTop > 0) return;
-                    startY = e.touches[0].clientY; startTime = performance.now(); isTracking = true; overlay.style.transition = 'none';
-                }, { passive: true });
-                target.addEventListener('touchmove', (e) => {
-                    if (!isTracking) return;
-                    currentY = e.touches[0].clientY; let deltaY = currentY - startY;
-                    if (deltaY > 0) { overlay.style.transform = `translateY(${deltaY}px)`; }
-                }, { passive: true });
+                target.addEventListener('touchstart', (e) => { if(overlay.scrollTop > 0) return; startY = e.touches[0].clientY; startTime = performance.now(); isTracking = true; overlay.style.transition = 'none'; }, { passive: true });
+                target.addEventListener('touchmove', (e) => { if (!isTracking) return; currentY = e.touches[0].clientY; let deltaY = currentY - startY; if (deltaY > 0) { overlay.style.transform = `translateY(${deltaY}px)`; } }, { passive: true });
                 target.addEventListener('touchend', (e) => {
-                    if (!isTracking) return; isTracking = false;
-                    let deltaY = currentY - startY; let duration = performance.now() - startTime; let velocity = deltaY / duration;
+                    if (!isTracking) return; isTracking = false; let deltaY = currentY - startY; let duration = performance.now() - startTime; let velocity = deltaY / duration;
                     overlay.style.transition = 'transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)';
                     if (deltaY > window.innerHeight * 0.35 || velocity > 0.5) { overlay.style.transform = 'translateY(100%)'; overlay.classList.remove('show'); } 
                     else { overlay.style.transform = 'translateY(0px)'; }
