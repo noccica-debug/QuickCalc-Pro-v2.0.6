@@ -122,10 +122,8 @@
         
         .btn-radar-float { position: absolute; right: 16px; width: 44px; height: 44px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: background 0.2s; text-transform: uppercase; line-height: 1.1; }
         
-        /* Pixel-perfect 56px intervals */
         .btn-gps { bottom: 16px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
-        .btn-multi-navi { bottom: 72px; background: var(--m3-primary); color: var(--m3-on-primary); border-color: var(--m3-primary); }
-        .btn-map-lock { bottom: 128px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
+        .btn-map-lock { bottom: 72px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
         .btn-map-lock.locked { background: var(--m3-error); border-color: var(--m3-error); }
         
         .btn-bundle { position: absolute; bottom: 72px; left: 16px; width: 44px; height: 44px; border-radius: 22px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.4); backdrop-filter: blur(4px); cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; transition: background 0.2s; line-height: 1.1; }
@@ -158,9 +156,6 @@
         #toast.show { opacity: 1; }
         
         .sys-header { text-align: center; font-size: 12px; color: var(--m3-primary); margin-bottom: 16px; font-weight: 900; }
-        
-        /* v2.0.5 Lock Measure Tooltip */
-        .measure-tooltip { background: rgba(0,0,0,0.7); color: #00e5ff; border: 1px solid #00e5ff; font-weight: 900; font-size: 11px; padding: 2px 6px; border-radius: 4px; pointer-events:none; }
     </style>
 </head>
 <body>
@@ -279,10 +274,9 @@
             </div>
             
             <div id="radar-hud" class="radar-hud" onclick="GeosticsOS.toggleHUD()"></div>
-            <div id="gps-badge" class="gps-badge">📍 <span id="gps-text"></span></div>
+            <div id="gps-badge" class="gps-badge"><span id="gps-text"></span></div>
             
             <button class="btn-radar-float btn-map-lock" id="btn-map-lock" onclick="GeosticsOS.toggleMapLock()">LOCK</button>
-            <button class="btn-radar-float btn-multi-navi" onclick="GeosticsOS.executeMultiNavi()">MULTI<br>NAVI</button>
             <button class="btn-bundle" id="btn-chain-calc" onclick="GeosticsOS.openChainCalcModal()">BUNDLE<br>BOX</button>
             <button class="btn-radar-float btn-gps" onclick="GeosticsOS.fetchManualGPS()">GPS</button>
             <div id="radar-quick-sel" class="quick-sel-container"></div>
@@ -361,20 +355,15 @@
         <div class="modal-body">
             <div class="flex-between mb-16">
                 <div class="text-bold" style="font-size:14px; color: var(--m3-primary);">BUNDLE CALCULATION</div>
-                <button class="btn-icon btn-red" style="width:30px; border-radius:15px; padding:0;" onclick="toggleModal('popChainCalc')">X</button>
+                <div class="flex-center gap-8">
+                    <button class="btn-icon" id="btn-greedy-toggle" onclick="GeosticsOS.toggleGreedyMode()" style="color:var(--m3-primary); border-color:var(--m3-primary);">GREEDY</button>
+                    <button class="btn-icon btn-red" style="width:30px; border-radius:15px; padding:0;" onclick="toggleModal('popChainCalc')">X</button>
+                </div>
             </div>
-            <div id="bundle-timer-display" style="font-size:11px; text-align:center; color:var(--m3-primary); font-weight:900; margin-bottom:12px; display:none;">STARTED: --:--</div>
+            <div id="bundle-timer-display" onclick="GeosticsOS.editBundleTimer()" style="font-size:11px; text-align:center; color:var(--m3-primary); font-weight:900; margin-bottom:12px; display:none; cursor:pointer;">STARTED: --:--</div>
             
-            <div class="flex-between mb-8">
-                <div style="font-size:12px; font-weight:800; color:var(--m3-muted);">SEQUENCES</div>
-                <label style="display:flex; align-items:center; gap:4px; font-size:11px; font-weight:800; color:var(--m3-primary); cursor:pointer;">
-                    <input type="checkbox" id="chk-greedy" checked onchange="GeosticsOS.updateChainCalculation()" style="accent-color:var(--m3-primary);"> GREEDY ALGO
-                </label>
-            </div>
-            <div id="bundle-seq-manual" style="font-size:10px; color:var(--m3-outline); margin-bottom:4px; word-break:break-all;">[MANUAL] --</div>
-            <div id="bundle-seq-greedy" style="font-size:10px; color:var(--m3-primary); margin-bottom:12px; font-weight:700; word-break:break-all;">[GREEDY] --</div>
-
-            <div id="chain-order-list" style="max-height:110px; overflow-y:auto; margin-bottom:16px; background:var(--m3-surface-low); padding:12px; border-radius:12px; border:1px solid var(--m3-outline-variant);"></div>
+            <div id="chain-order-list" style="max-height:150px; overflow-y:auto; margin-bottom:8px; background:var(--m3-surface-low); padding:12px; border-radius:12px; border:1px solid var(--m3-outline-variant);"></div>
+            <div id="chain-seq-compare" style="font-size:10px; margin-bottom:12px; background:var(--m3-surface-low); padding:8px; border-radius:8px; line-height:1.4; word-break:keep-all;"></div>
             
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; padding-top:10px; border-top:1px solid var(--m3-outline-variant);">
                 <div>
@@ -398,23 +387,10 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="popMultiNavi" onclick="if(event.target===this) toggleModal('popMultiNavi')">
-        <div class="modal-body">
-            <div class="flex-between mb-16">
-                <div class="text-bold" style="font-size:14px;">ROUTE SEQUENCE</div>
-                <button class="btn-icon btn-red" style="width:30px; border-radius:15px; padding:0;" onclick="toggleModal('popMultiNavi')">X</button>
-            </div>
-            <div id="navi-sequence-display" style="font-size:12px; margin-bottom:12px; color:var(--m3-primary); font-weight:900; text-align:center; word-break:break-all;">SELECT ORDERS (MAX 5)</div>
-            <div id="navi-order-list" style="max-height:180px; overflow-y:auto; margin-bottom:16px; background:var(--m3-surface-low); padding:12px; border-radius:12px; border:1px solid var(--m3-outline-variant); display:flex; flex-direction:column; gap:6px;"></div>
-            <div class="flex-between gap-12">
-                <button class="btn-core" style="flex:0.3; background:var(--m3-surface-low); color:var(--m3-error);" onclick="GeosticsOS.resetNaviSequence()">RESET</button>
-                <button class="btn-core" style="flex:0.7;" onclick="GeosticsOS.launchMultiNaviWithSequence()">MULTI NAVI</button>
-            </div>
-        </div>
-    </div>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        const SUBWAY_DATA = [{"name":"서울","line":"1","lat":37.55315,"lng":126.972533},{"name":"시청","line":"1","lat":37.56359,"lng":126.975407},{"name":"종각","line":"1","lat":37.570203,"lng":126.983116},{"name":"종로3가","line":"1","lat":37.570429,"lng":126.992095},{"name":"종로5가","line":"1","lat":37.570971,"lng":127.0019},{"name":"동대문","line":"1","lat":37.57179,"lng":127.011383},{"name":"동묘앞","line":"1","lat":37.573265,"lng":127.016459},{"name":"신설동","line":"1","lat":37.576117,"lng":127.02471},{"name":"제기동","line":"1","lat":37.578116,"lng":127.034902},{"name":"청량리","line":"1","lat":37.580148,"lng":127.045063},{"name":"을지로입구","line":"2","lat":37.565998,"lng":126.982569},{"name":"을지로3가","line":"2","lat":37.566292,"lng":126.991773},{"name":"을지로4가","line":"2","lat":37.566611,"lng":126.998122},{"name":"동대문역사문화공원","line":"2","lat":37.565597,"lng":127.009113},{"name":"신당","line":"2","lat":37.565681,"lng":127.019488},{"name":"상왕십리","line":"2","lat":37.564504,"lng":127.028872},{"name":"왕십리","line":"2","lat":37.561159,"lng":127.035505},{"name":"한양대","line":"2","lat":37.55658,"lng":127.043504},{"name":"뚝섬","line":"2","lat":37.54718,"lng":127.047413},{"name":"성수","line":"2","lat":37.544628,"lng":127.055983},{"name":"건대입구","line":"2","lat":37.540408,"lng":127.069231},{"name":"구의","line":"2","lat":37.536857,"lng":127.085024},{"name":"강변","line":"2","lat":37.535161,"lng":127.094684},{"name":"잠실나루","line":"2","lat":37.520688,"lng":127.103836},{"name":"잠실","line":"2","lat":37.513305,"lng":127.100129},{"name":"잠실새내","line":"2","lat":37.520731,"lng":127.103738},{"name":"종합운동장","line":"2","lat":37.511008,"lng":127.073641},{"name":"삼성","line":"2","lat":37.508827,"lng":127.063203},{"name":"선릉","line":"2","lat":37.504257,"lng":127.048174},{"name":"역삼","line":"2","lat":37.500658,"lng":127.03643},{"name":"강남","line":"2","lat":37.497958,"lng":127.027539},{"name":"교대","line":"2","lat":37.493957,"lng":127.014631},{"name":"서초","line":"2","lat":37.49191,"lng":127.007945},{"name":"방배","line":"2","lat":37.481469,"lng":126.997627},{"name":"사당","line":"2","lat":37.476536,"lng":126.981631},{"name":"낙성대","line":"2","lat":37.47693,"lng":126.963783},{"name":"서울대입구","line":"2","lat":37.481233,"lng":126.952745},{"name":"봉천","line":"2","lat":37.482416,"lng":126.941896},{"name":"신림","line":"2","lat":37.484216,"lng":126.929573},{"name":"신대방","line":"2","lat":37.487534,"lng":126.913279},{"name":"구로디지털단지","line":"2","lat":37.485005,"lng":126.902626},{"name":"대림","line":"2","lat":37.492426,"lng":126.895293},{"name":"신도림","line":"2","lat":37.508815,"lng":126.891222},{"name":"문래","line":"2","lat":37.517993,"lng":126.894766},{"name":"영등포구청","line":"2","lat":37.525766,"lng":126.896627},{"name":"당산","line":"2","lat":37.533877,"lng":126.902011},{"name":"합정","line":"2","lat":37.550025,"lng":126.914557},{"name":"홍대입구","line":"2","lat":37.556748,"lng":126.923643},{"name":"신촌","line":"2","lat":37.555153,"lng":126.93689},{"name":"이대","line":"2","lat":37.556734,"lng":126.945897},{"name":"아현","line":"2","lat":37.557407,"lng":126.956079},{"name":"충정로","line":"2","lat":37.559742,"lng":126.964455},{"name":"용두","line":"2","lat":37.574012,"lng":127.03811},{"name":"신답","line":"2","lat":37.56147,"lng":127.056348},{"name":"용답","line":"2","lat":37.566412,"lng":126.977863},{"name":"도림천","line":"2","lat":37.514759,"lng":126.882586},{"name":"양천구청","line":"2","lat":37.512194,"lng":126.865193},{"name":"신정네거리","line":"2","lat":37.520218,"lng":126.852849},{"name":"까치산","line":"2","lat":37.53181,"lng":126.846706},{"name":"지축","line":"3","lat":37.648281,"lng":126.912551},{"name":"구파발","line":"3","lat":37.636612,"lng":126.918827},{"name":"연신내","line":"3","lat":37.618855,"lng":126.920859},{"name":"불광","line":"3","lat":37.610554,"lng":126.929843},{"name":"녹번","line":"3","lat":37.600882,"lng":126.935758},{"name":"홍제","line":"3","lat":37.588851,"lng":126.944092},{"name":"무악재","line":"3","lat":37.582658,"lng":126.950131},{"name":"독립문","line":"3","lat":37.574534,"lng":126.957902},{"name":"경복궁","line":"3","lat":37.575844,"lng":126.973576},{"name":"안국","line":"3","lat":37.576562,"lng":126.98547},{"name":"충무로","line":"3","lat":37.561302,"lng":126.995473},{"name":"동대입구","line":"3","lat":37.55816,"lng":127.005273},{"name":"약수","line":"3","lat":37.554674,"lng":127.010628},{"name":"금호","line":"3","lat":37.548269,"lng":127.015785},{"name":"옥수","line":"3","lat":37.541653,"lng":127.017303},{"name":"압구정","line":"3","lat":37.526169,"lng":127.028502},{"name":"신사","line":"3","lat":37.516438,"lng":127.020247},{"name":"잠원","line":"3","lat":37.512989,"lng":127.011613},{"name":"고속터미널","line":"3","lat":37.504953,"lng":127.004916},{"name":"남부터미널","line":"3","lat":37.48494,"lng":127.016289},{"name":"양재","line":"3","lat":37.48466,"lng":127.03513},{"name":"매봉","line":"3","lat":37.487114,"lng":127.046907},{"name":"도곡","line":"3","lat":37.491129,"lng":127.055694},{"name":"대치","line":"3","lat":37.494601,"lng":127.063449},{"name":"학여울","line":"3","lat":37.496757,"lng":127.070541},{"name":"대청","line":"3","lat":37.493607,"lng":127.079526},{"name":"일원","line":"3","lat":37.48389,"lng":127.08416},{"name":"수서","line":"3","lat":37.487507,"lng":127.101324},{"name":"가락시장","line":"3","lat":37.492368,"lng":127.118101},{"name":"경찰병원","line":"3","lat":37.495754,"lng":127.124198},{"name":"오금","line":"3","lat":37.502288,"lng":127.128344},{"name":"당고개","line":"4","lat":37.66956,"lng":127.078404},{"name":"상계","line":"4","lat":37.660576,"lng":127.073199},{"name":"노원","line":"4","lat":37.656274,"lng":127.063183},{"name":"창동","line":"4","lat":37.652993,"lng":127.046746},{"name":"쌍문","line":"4","lat":37.648274,"lng":127.034381},{"name":"수유","line":"4","lat":37.637127,"lng":127.024731},{"name":"미아","line":"4","lat":37.626435,"lng":127.026151},{"name":"미아사거리","line":"4","lat":37.613276,"lng":127.030083},{"name":"길음","line":"4","lat":37.604087,"lng":127.025353},{"name":"성신여대입구","line":"4","lat":37.592782,"lng":127.017338},{"name":"한성대입구","line":"4","lat":37.58838,"lng":127.006751},{"name":"혜화","line":"4","lat":37.582116,"lng":127.001759},{"name":"명동","line":"4","lat":37.561055,"lng":126.988271},{"name":"회현","line":"4","lat":37.559698,"lng":126.979565},{"name":"숙대입구","line":"4","lat":37.545124,"lng":126.971952},{"name":"삼각지","line":"4","lat":37.535057,"lng":126.973354},{"name":"신용산","line":"4","lat":37.52919,"lng":126.96858},{"name":"이촌","line":"4","lat":37.522525,"lng":126.97335},{"name":"동작","line":"4","lat":37.503567,"lng":126.980171},{"name":"총신대입구","line":"4","lat":37.487521,"lng":126.982309},{"name":"남태령","line":"4","lat":37.464339,"lng":126.989081},{"name":"방화","line":"5","lat":37.577669,"lng":126.812822},{"name":"개화산","line":"5","lat":37.572458,"lng":126.806838},{"name":"김포공항","line":"5","lat":37.56217,"lng":126.801273},{"name":"송정","line":"5","lat":37.561411,"lng":126.812052},{"name":"마곡","line":"5","lat":37.562182,"lng":126.82693},{"name":"발산","line":"5","lat":37.562182,"lng":126.82693},{"name":"우장산","line":"5","lat":37.548864,"lng":126.83633},{"name":"화곡","line":"5","lat":37.541585,"lng":126.840436},{"name":"신정","line":"5","lat":37.525001,"lng":126.856176},{"name":"목동","line":"5","lat":37.526088,"lng":126.864296},{"name":"오목교","line":"5","lat":37.524557,"lng":126.875049},{"name":"양평","line":"5","lat":37.525614,"lng":126.886177},{"name":"영등포시장","line":"5","lat":37.52276,"lng":126.905143},{"name":"신길","line":"5","lat":37.51763,"lng":126.914886},{"name":"여의도","line":"5","lat":37.521578,"lng":126.924318},{"name":"여의나루","line":"5","lat":37.527145,"lng":126.932807},{"name":"마포","line":"5","lat":37.539718,"lng":126.946043},{"name":"공덕","line":"5","lat":37.544005,"lng":126.951058},{"name":"애오개","line":"5","lat":37.553592,"lng":126.956733},{"name":"서대문","line":"5","lat":37.565812,"lng":126.966639},{"name":"광화문","line":"5","lat":37.570545,"lng":126.976568},{"name":"청구","line":"5","lat":37.560237,"lng":127.01379},{"name":"신금호","line":"5","lat":37.554504,"lng":127.020403},{"name":"행당","line":"5","lat":37.557297,"lng":127.029482},{"name":"마장","line":"5","lat":37.566066,"lng":127.042921},{"name":"답십리","line":"5","lat":37.566833,"lng":127.05266},{"name":"장한평","line":"5","lat":37.561438,"lng":127.064601},{"name":"군자","line":"5","lat":37.557102,"lng":127.079559},{"name":"아차산","line":"5","lat":37.552005,"lng":127.089609},{"name":"광나루","line":"5","lat":37.545301,"lng":127.103478},{"name":"강동","line":"5","lat":37.53581,"lng":127.13249},{"name":"길동","line":"5","lat":37.538022,"lng":127.140085},{"name":"굽은다리","line":"5","lat":37.545442,"lng":127.142844},{"name":"명일","line":"5","lat":37.551317,"lng":127.144002},{"name":"고덕","line":"5","lat":37.555002,"lng":127.154214},{"name":"상일동","line":"5","lat":37.556714,"lng":127.166381},{"name":"둔촌동","line":"5","lat":37.527787,"lng":127.136219},{"name":"올림픽공원","line":"5","lat":37.516217,"lng":127.130957},{"name":"방이","line":"5","lat":37.508752,"lng":127.126054},{"name":"개롱","line":"5","lat":37.498097,"lng":127.134817},{"name":"거여","line":"5","lat":37.493208,"lng":127.143983},{"name":"마천","line":"5","lat":37.494972,"lng":127.152784},{"name":"강일","line":"5","lat":37.557521,"lng":127.176018},{"name":"미사","line":"5","lat":37.56329,"lng":127.192954},{"name":"하남풍산","line":"5","lat":37.552201,"lng":127.203897},{"name":"하남시청","line":"5","lat":37.541723,"lng":127.206901},{"name":"하남검단산","line":"5","lat":37.539729,"lng":127.223427},{"name":"응암","line":"6","lat":37.59859,"lng":126.915583},{"name":"역촌","line":"6","lat":37.60605,"lng":126.922764},{"name":"독바위","line":"6","lat":37.618413,"lng":126.933035},{"name":"구산","line":"6","lat":37.611223,"lng":126.917246},{"name":"새절","line":"6","lat":37.591148,"lng":126.913613},{"name":"증산","line":"6","lat":37.583989,"lng":126.909785},{"name":"디지털미디어시티","line":"6","lat":37.577005,"lng":126.898643},{"name":"월드컵경기장","line":"6","lat":37.569439,"lng":126.899077},{"name":"마포구청","line":"6","lat":37.563535,"lng":126.903326},{"name":"망원","line":"6","lat":37.556031,"lng":126.910129},{"name":"상수","line":"6","lat":37.547704,"lng":126.92292},{"name":"광흥창","line":"6","lat":37.547464,"lng":126.931971},{"name":"대흥","line":"6","lat":37.547732,"lng":126.942214},{"name":"효창공원앞","line":"6","lat":37.539279,"lng":126.961348},{"name":"녹사평","line":"6","lat":37.53469,"lng":126.98665},{"name":"이태원","line":"6","lat":37.534485,"lng":126.994369},{"name":"한강진","line":"6","lat":37.53956,"lng":127.001729},{"name":"버티고개","line":"6","lat":37.547933,"lng":127.006948},{"name":"창신","line":"6","lat":37.579772,"lng":127.015246},{"name":"보문","line":"6","lat":37.585293,"lng":127.019377},{"name":"안암","line":"6","lat":37.586261,"lng":127.02903},{"name":"고려대","line":"6","lat":37.59034,"lng":127.03626},{"name":"월곡","line":"6","lat":37.60192,"lng":127.041492},{"name":"상월곡","line":"6","lat":37.606392,"lng":127.048509},{"name":"돌곶이","line":"6","lat":37.610522,"lng":127.056419},{"name":"석계","line":"6","lat":37.614937,"lng":127.065922},{"name":"화랑대","line":"6","lat":37.619875,"lng":127.084106},{"name":"봉화산","line":"6","lat":37.617293,"lng":127.091375},{"name":"신내","line":"6","lat":37.612571,"lng":127.104326},{"name":"장암","line":"7","lat":37.70015,"lng":127.053126},{"name":"도봉산","line":"7","lat":37.689131,"lng":127.046548},{"name":"수락산","line":"7","lat":37.677804,"lng":127.055314},{"name":"마들","line":"7","lat":37.664985,"lng":127.057701},{"name":"중계","line":"7","lat":37.645052,"lng":127.064084},{"name":"하계","line":"7","lat":37.636363,"lng":127.067999},{"name":"공릉","line":"7","lat":37.625642,"lng":127.072969},{"name":"태릉입구","line":"7","lat":37.617319,"lng":127.074741},{"name":"먹골","line":"7","lat":37.610638,"lng":127.077719},{"name":"중화","line":"7","lat":37.602604,"lng":127.079254},{"name":"상봉","line":"7","lat":37.595673,"lng":127.085708},{"name":"면목","line":"7","lat":37.588671,"lng":127.087503},{"name":"사가정","line":"7","lat":37.580912,"lng":127.088502},{"name":"용마산","line":"7","lat":37.573752,"lng":127.086802},{"name":"중곡","line":"7","lat":37.565877,"lng":127.084291},{"name":"어린이대공원","line":"7","lat":37.547962,"lng":127.07465},{"name":"뚝섬유원지","line":"7","lat":37.531558,"lng":127.066714},{"name":"청담","line":"7","lat":37.519097,"lng":127.051851},{"name":"강남구청","line":"7","lat":37.517185,"lng":127.04122},{"name":"학동","line":"7","lat":37.514262,"lng":127.031738},{"name":"논현","line":"7","lat":37.511108,"lng":127.021385},{"name":"반포","line":"7","lat":37.508171,"lng":127.011717},{"name":"내방","line":"7","lat":37.48764,"lng":126.993541},{"name":"남성","line":"7","lat":37.484688,"lng":126.971108},{"name":"숭실대입구","line":"7","lat":37.496258,"lng":126.953649},{"name":"상도","line":"7","lat":37.50279,"lng":126.947949},{"name":"장승배기","line":"7","lat":37.504845,"lng":126.939025},{"name":"신대방삼거리","line":"7","lat":37.499717,"lng":126.928218},{"name":"보라매","line":"7","lat":37.499916,"lng":126.920112},{"name":"신풍","line":"7","lat":37.500107,"lng":126.909806},{"name":"남구로","line":"7","lat":37.486181,"lng":126.887372},{"name":"가산디지털단지","line":"7","lat":37.480376,"lng":126.882704},{"name":"철산","line":"7","lat":37.47616,"lng":126.868217},{"name":"광명사거리","line":"7","lat":37.47927,"lng":126.854854},{"name":"천왕","line":"7","lat":37.486699,"lng":126.838684},{"name":"온수","line":"7","lat":37.492258,"lng":126.823388}];
+
         // ================= UI & COMMON =================
         let toastTimeout;
         function showToast(msg) { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('show'); clearTimeout(toastTimeout); toastTimeout = setTimeout(() => t.classList.remove('show'), 2000); }
@@ -455,12 +431,16 @@
             const m = String(n.getMinutes()).padStart(2,'0');
             document.getElementById('sysClock').innerText = `${h}:${m}`;
             
-            const todayStr = n.getFullYear() + '-' + String(n.getMonth()+1).padStart(2,'0') + '-' + String(n.getDate()).padStart(2,'0');
+            const todayStr = n.toISOString().split('T')[0];
             const lastSync = localStorage.getItem('qcp_last_sync_date');
-            if (!lastSync) { localStorage.setItem('qcp_last_sync_date', todayStr); } 
-            else if (lastSync !== todayStr) {
-                if(QuickCalc.orders.length > 0) QuickCalc.autoSyncAndClear(todayStr);
-                else localStorage.setItem('qcp_last_sync_date', todayStr);
+            
+            if (!lastSync) { 
+                localStorage.setItem('qcp_last_sync_date', todayStr); 
+            } else if (lastSync !== todayStr) {
+                localStorage.setItem('qcp_last_sync_date', todayStr); 
+                if(QuickCalc.orders.length > 0 || QuickCalc.loadDataSafely('qcp_bundle_logs_v203', []).length > 0) {
+                    QuickCalc.autoSyncAndClear(todayStr);
+                }
             }
         }, 1000);
         function getNowTimeString() { const n = new Date(); return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`; }
@@ -470,9 +450,10 @@
             map: null, routeVectors: [], currentRoute: null,
             seoulCenter: [37.5665, 126.9780], 
             userMarker: null, selectedVectorId: null, hudVisible: true,
-            chainPolyline: null, chainMarkers: [], mapLocked: false,
-            naviSelectedOrders: [], chainSelectedOrders: [], bundleStartTime: null,
-            lastCalculatedDist: 0, isMeasuring: false, measureLine: null, measureTooltip: null,
+            chainPolyline: null, chainPolylineManual: null, chainMarkers: [], mapLocked: false,
+            chainSelectedOrders: [], bundleStartTime: null,
+            lastCalculatedDist: 0, isGreedyMode: false,
+            lastManualSeq: [], lastGreedySeq: [],
 
             init: function() {
                 if (this.map) return;
@@ -481,32 +462,6 @@
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', { attribution: '' }).addTo(this.map);
                 this.map.attributionControl.setPrefix(false); 
                 if (window.ResizeObserver) { new ResizeObserver(() => { if (this.map) this.map.invalidateSize(); }).observe(document.getElementById('view-map')); }
-
-                this.map.on('mousedown touchstart', (e) => {
-                    if (!this.mapLocked || !this.userMarker) return;
-                    let pt1 = this.map.latLngToContainerPoint(this.userMarker.getLatLng());
-                    let pt2 = e.containerPoint;
-                    if (pt1.distanceTo(pt2) < 50) {
-                        this.isMeasuring = true;
-                        this.measureLine = L.polyline([this.userMarker.getLatLng(), e.latlng], {color: '#00e5ff', weight: 3, dashArray: '5,5', opacity: 0.8}).addTo(this.map);
-                        this.measureTooltip = L.tooltip({permanent: true, className: 'measure-tooltip', direction: 'right'}).setLatLng(e.latlng).setContent('0.0km').addTo(this.map);
-                    }
-                });
-                this.map.on('mousemove touchmove', (e) => {
-                    if (this.isMeasuring) {
-                        let uPos = this.userMarker.getLatLng();
-                        this.measureLine.setLatLngs([uPos, e.latlng]);
-                        let d = this.calcCrow(uPos.lat, uPos.lng, e.latlng.lat, e.latlng.lng);
-                        this.measureTooltip.setLatLng(e.latlng).setContent(d.toFixed(2) + 'km');
-                    }
-                });
-                this.map.on('mouseup touchend', (e) => {
-                    if (this.isMeasuring) {
-                        this.isMeasuring = false;
-                        if(this.measureLine) this.map.removeLayer(this.measureLine);
-                        if(this.measureTooltip) this.map.removeLayer(this.measureTooltip);
-                    }
-                });
             },
 
             toggleMapLock: function() {
@@ -549,7 +504,7 @@
                         (position) => { 
                             const lat = position.coords.latitude; const lng = position.coords.longitude;
                             this.updateUserMarker(lat, lng);
-                            this.reverseGeocode(lat, lng);
+                            this.processLandmarkGPS(lat, lng);
                             this.autofitActiveBounds(lat, lng);
                         },
                         (err) => { 
@@ -560,12 +515,31 @@
                     );
                 }
             },
+            
+            processLandmarkGPS: function(lat, lng) {
+                let minD = Infinity; let nearestName = "";
+                SUBWAY_DATA.forEach(s => {
+                    let d = this.calcCrow(lat, lng, s.lat, s.lng);
+                    if(d < minD) { minD = d; nearestName = s.name; }
+                });
+                
+                let txt = "GPS READY";
+                if(minD <= 3.0) {
+                    txt = `GPS READY (${nearestName}역 ${minD.toFixed(1)}km)`;
+                }
+                
+                const badge = document.getElementById('gps-badge');
+                document.getElementById('gps-text').innerText = txt;
+                badge.style.display = 'block';
+                setTimeout(() => badge.style.display = 'none', 10000);
+            },
 
             autofitActiveBounds: function(fallbackLat, fallbackLng) {
                 if(!this.map) return;
                 let activeLayers = [];
                 this.routeVectors.forEach(v => { if(v instanceof L.Polyline) activeLayers.push(v); });
                 if(this.chainPolyline) activeLayers.push(this.chainPolyline);
+                if(this.chainPolylineManual) activeLayers.push(this.chainPolylineManual);
                 if(this.userMarker) activeLayers.push(this.userMarker);
                 
                 if(activeLayers.length > 0) {
@@ -587,42 +561,6 @@
                 this.userMarker.setZIndexOffset(9999);
             },
 
-            reverseGeocode: async function(lat, lng) {
-                const apiKey = localStorage.getItem('qcp_key_tmap');
-                if(!apiKey) { this.showFallbackGPS(); return; }
-                try {
-                    const res = await fetch(`https://apis.openapi.sk.com/tmap/geo/reversegeocoding?version=1&lat=${lat}&lon=${lng}&appKey=${apiKey}&coordType=WGS84GEO&addressType=A04`);
-                    const data = await res.json();
-                    if(data && data.addressInfo) {
-                        const info = data.addressInfo;
-                        const gungun = info.gu_gun || '';
-                        const dong = info.legalDong || info.adminDong || info.eup_myun || info.ri || '';
-                        const road = info.roadName || '';
-                        const badge = document.getElementById('gps-badge');
-                        
-                        let cleanGungun = gungun.replace(/^(서울특별시|경기도|인천광역시|서울시|경기)/g, "").trim();
-                        let cleanDong = dong.replace(/^(서울특별시|경기도|인천광역시|서울시|경기)/g, "").trim();
-                        let cleanRoad = road.replace(/^(서울특별시|경기도|인천광역시|서울시|경기)/g, "").trim();
-                        
-                        let fullStr = (cleanGungun ? cleanGungun + " " : "") + cleanDong;
-                        if(cleanRoad) fullStr += ` (${cleanRoad})`;
-
-                        if(cleanDong) {
-                            document.getElementById('gps-text').innerText = fullStr;
-                            badge.style.display = 'block';
-                            setTimeout(() => badge.style.display = 'none', 10000);
-                        } else { this.showFallbackGPS(); }
-                    } else { this.showFallbackGPS(); }
-                } catch (e) { showToast("API ERROR"); console.error(e); this.showFallbackGPS(); }
-            },
-
-            showFallbackGPS: function() {
-                const badge = document.getElementById('gps-badge');
-                document.getElementById('gps-text').innerText = "LOCATED";
-                badge.style.display = 'block';
-                setTimeout(() => badge.style.display = 'none', 5000);
-            },
-
             resetRadar: function() {
                 this.currentRoute = null; this.selectedVectorId = null;
                 this.clearVectors(); this.clearChainPolyline();
@@ -639,8 +577,9 @@
 
             clearChainPolyline: function() {
                 if(this.chainPolyline && this.map) this.map.removeLayer(this.chainPolyline);
+                if(this.chainPolylineManual && this.map) this.map.removeLayer(this.chainPolylineManual);
                 this.chainMarkers.forEach(m => { if(this.map) this.map.removeLayer(m); });
-                this.chainPolyline = null; this.chainMarkers = [];
+                this.chainPolyline = null; this.chainPolylineManual = null; this.chainMarkers = [];
             },
 
             storeRouteData: function(pLat, pLng, dLat, dLng, srtP, srtD, dist, time, hourly) {
@@ -690,11 +629,14 @@
                         
                         const bearing = this.calcBearing(pLat, pLng, dLat, dLng);
                         const midLat = (pLat + dLat) / 2; const midLng = (pLng + dLng) / 2;
+                        const distKm = this.calcCrow(pLat, pLng, dLat, dLng).toFixed(1);
+                        
                         const arrowIcon = L.divIcon({ 
                             className: 'marker-arrow', iconSize: [32, 32], 
-                            html: `<div style="transform: rotate(${bearing - 90}deg); color: ${vColor}; opacity: ${opac}; font-size: 26px; display: flex; align-items: center; justify-content: center; position: relative;">
-                                ▶<span style="position: absolute; color: #fff; font-size: 11px; font-weight: 900; transform: rotate(${90 - bearing}deg); text-shadow: 1px 1px 2px #000; top: -14px;">${o.displayNo}</span>
-                                <span style="position: absolute; color: #fff; font-size: 10px; font-weight: 700; transform: rotate(${90 - bearing}deg); text-shadow: 1px 1px 2px #000; top: 16px; white-space:nowrap;">${o.dist ? o.dist.toFixed(1) + 'km' : ''}</span>
+                            html: `<div style="position:relative; display:flex; align-items:center; justify-content:center;">
+                                <div style="transform: rotate(${bearing - 90}deg); color: ${vColor}; opacity: ${opac}; font-size: 26px;">▶</div>
+                                <span style="position: absolute; color: #fff; font-size: 11px; font-weight: 900; transform: rotate(${90 - bearing}deg); text-shadow: 1px 1px 2px #000;">${o.displayNo}</span>
+                                <div style="position:absolute; top:-18px; font-size:9px; background:rgba(0,0,0,0.8); color:#fff; padding:2px 4px; border-radius:4px; font-weight:700; white-space:nowrap; text-shadow:none;">${distKm}km</div>
                             </div>` 
                         });
                         const arrowMarker = L.marker([midLat, midLng], { icon: arrowIcon }).addTo(this.map);
@@ -742,11 +684,14 @@
 
                     const bearing = this.calcBearing(pLat, pLng, dLat, dLng);
                     const midLat = (pLat + dLat) / 2; const midLng = (pLng + dLng) / 2;
+                    const distKm = this.calcCrow(pLat, pLng, dLat, dLng).toFixed(1);
+                    
                     const arrowIcon = L.divIcon({ 
                         className: 'marker-arrow', iconSize: [32, 32], 
-                        html: `<div style="transform: rotate(${bearing - 90}deg); color: ${vColor}; opacity: ${opac}; font-size: 26px; display: flex; align-items: center; justify-content: center; position: relative;">
-                            ▶<span style="position: absolute; color: #fff; font-size: 11px; font-weight: 900; transform: rotate(${90 - bearing}deg); text-shadow: 1px 1px 2px #000; top: -14px;">N</span>
-                            <span style="position: absolute; color: #fff; font-size: 10px; font-weight: 700; transform: rotate(${90 - bearing}deg); text-shadow: 1px 1px 2px #000; top: 16px; white-space:nowrap;">${dist ? dist.toFixed(1) + 'km' : ''}</span>
+                        html: `<div style="position:relative; display:flex; align-items:center; justify-content:center;">
+                            <div style="transform: rotate(${bearing - 90}deg); color: ${vColor}; opacity: ${opac}; font-size: 26px;">▶</div>
+                            <span style="position: absolute; color: #fff; font-size: 11px; font-weight: 900; transform: rotate(${90 - bearing}deg); text-shadow: 1px 1px 2px #000;">N</span>
+                            <div style="position:absolute; top:-18px; font-size:9px; background:rgba(0,0,0,0.8); color:#fff; padding:2px 4px; border-radius:4px; font-weight:700; white-space:nowrap; text-shadow:none;">${distKm}km</div>
                         </div>` 
                     });
                     const arrowMarker = L.marker([midLat, midLng], { icon: arrowIcon }).addTo(this.map);
@@ -789,6 +734,14 @@
                 this.updateChainCalculation();
                 toggleModal('popChainCalc');
             },
+            
+            toggleGreedyMode: function() {
+                this.isGreedyMode = !this.isGreedyMode;
+                let btn = document.getElementById('btn-greedy-toggle');
+                if(this.isGreedyMode) { btn.style.background = 'var(--m3-primary)'; btn.style.color = 'var(--m3-on-primary)'; }
+                else { btn.style.background = 'transparent'; btn.style.color = 'var(--m3-primary)'; }
+                this.updateChainCalculation();
+            },
 
             toggleChainOrder: function(id) {
                 const idx = this.chainSelectedOrders.findIndex(x => x.id === id);
@@ -820,108 +773,106 @@
                 }
 
                 let totalNet = 0;
-                let selectedOrders = this.chainSelectedOrders;
-                selectedOrders.forEach(o => { totalNet += QuickCalc.calcNetFare(o.fareK, o.platform); });
+                this.chainSelectedOrders.forEach(o => { totalNet += QuickCalc.calcNetFare(o.fareK, o.platform); });
 
-                let greedySequence = [];
                 let manualSequence = [];
-                let greedyDist = 0;
-                let manualDist = 0;
+                let greedySequence = [];
 
-                const isGreedy = document.getElementById('chk-greedy') ? document.getElementById('chk-greedy').checked : false;
-
-                if (selectedOrders.length > 0) {
-                    let lastPos = this.userMarker ? this.userMarker.getLatLng() : null;
-                    selectedOrders.forEach(o => {
-                        if(o.startCoords) {
-                            let p = { type: 'PICK', coords: o.startCoords, name: QuickCalc.extractDong(o.startDetail), displayNo: o.displayNo };
-                            manualSequence.push(p);
-                            if(lastPos) manualDist += this.calcCrow(lastPos.lat, lastPos.lng, p.coords.lat, p.coords.lng);
-                            lastPos = p.coords;
-                        }
-                        if(o.endCoords && o.endDetail) {
-                            let d = { type: 'DROP', coords: o.endCoords, name: QuickCalc.extractDong(o.endDetail), displayNo: o.displayNo };
-                            manualSequence.push(d);
-                            if(lastPos) manualDist += this.calcCrow(lastPos.lat, lastPos.lng, d.coords.lat, d.coords.lng);
-                            lastPos = d.coords;
-                        }
+                if (this.chainSelectedOrders.length > 0) {
+                    this.chainSelectedOrders.forEach(o => {
+                        if (o.startCoords) manualSequence.push({ type: 'PICK', coords: o.startCoords, displayNo: o.displayNo });
+                    });
+                    this.chainSelectedOrders.forEach(o => {
+                        if (o.endCoords && o.endDetail) manualSequence.push({ type: 'DROP', coords: o.endCoords, displayNo: o.displayNo });
                     });
 
-                    let unvisited = [];
-                    selectedOrders.forEach(o => {
-                        if (o.startCoords) { unvisited.push({ type: 'PICK', coords: o.startCoords, name: QuickCalc.extractDong(o.startDetail), orderId: o.id, displayNo: o.displayNo }); }
-                        if (o.endCoords && o.endDetail) { unvisited.push({ type: 'DROP', coords: o.endCoords, name: QuickCalc.extractDong(o.endDetail), orderId: o.id, displayNo: o.displayNo }); }
+                    let unvisitedDrops = [];
+                    this.chainSelectedOrders.forEach(o => {
+                        if (o.startCoords) greedySequence.push({ type: 'PICK', coords: o.startCoords, displayNo: o.displayNo });
+                    });
+                    this.chainSelectedOrders.forEach(o => {
+                        if (o.endCoords && o.endDetail) unvisitedDrops.push({ type: 'DROP', coords: o.endCoords, displayNo: o.displayNo });
                     });
 
-                    let pickedOrderIds = new Set();
                     let currentCoords = null;
-                    if (this.userMarker) { currentCoords = this.userMarker.getLatLng(); } 
-                    else if (unvisited.length > 0) { currentCoords = unvisited[0].coords; }
+                    if (greedySequence.length > 0) currentCoords = greedySequence[greedySequence.length - 1].coords;
+                    else if (this.userMarker) currentCoords = this.userMarker.getLatLng();
+                    else if (unvisitedDrops.length > 0) currentCoords = unvisitedDrops[0].coords;
 
-                    while (unvisited.length > 0) {
-                        let nextIdx = -1;
-                        let minDist = Infinity;
-                        let actualDist = Infinity;
-                        
-                        let hasUnvisitedPicks = unvisited.some(n => n.type === 'PICK');
-
-                        for (let i = 0; i < unvisited.length; i++) {
-                            let node = unvisited[i];
-                            if (node.type === 'DROP' && !pickedOrderIds.has(node.orderId)) continue;
-                            
-                            let d = this.calcCrow(currentCoords.lat, currentCoords.lng, node.coords.lat, node.coords.lng);
-                            let weightDist = d; 
-                            
-                            if (isGreedy) {
-                                if (node.type === 'DROP' && hasUnvisitedPicks) weightDist += 1000;
-                            } else {
-                                weightDist = node.type === 'DROP' ? d * 0.8 : d;
-                            }
-
-                            if (weightDist < minDist) { minDist = weightDist; actualDist = d; nextIdx = i; }
+                    while (unvisitedDrops.length > 0) {
+                        let nextIdx = -1; let minDist = Infinity;
+                        for (let i = 0; i < unvisitedDrops.length; i++) {
+                            let d = this.calcCrow(currentCoords.lat, currentCoords.lng, unvisitedDrops[i].coords.lat, unvisitedDrops[i].coords.lng);
+                            if (d < minDist) { minDist = d; nextIdx = i; }
                         }
-
                         if (nextIdx === -1) nextIdx = 0;
-                        let bestNode = unvisited.splice(nextIdx, 1)[0];
+                        let bestNode = unvisitedDrops.splice(nextIdx, 1)[0];
                         greedySequence.push(bestNode);
-                        if (bestNode.type === 'PICK') pickedOrderIds.add(bestNode.orderId);
-                        if (actualDist !== Infinity) greedyDist += actualDist;
                         currentCoords = bestNode.coords;
                     }
                 }
                 
-                let activeDist = isGreedy ? greedyDist : manualDist;
+                let manualDist = 0; let greedyDist = 0;
+                for(let i=0; i<manualSequence.length-1; i++) manualDist += this.calcCrow(manualSequence[i].coords.lat, manualSequence[i].coords.lng, manualSequence[i+1].coords.lat, manualSequence[i+1].coords.lng);
+                for(let i=0; i<greedySequence.length-1; i++) greedyDist += this.calcCrow(greedySequence[i].coords.lat, greedySequence[i].coords.lng, greedySequence[i+1].coords.lat, greedySequence[i+1].coords.lng);
                 
-                this.lastCalculatedDist = activeDist;
+                this.lastCalculatedDist = this.isGreedyMode ? greedyDist : manualDist;
+                let activeSequence = this.isGreedyMode ? greedySequence : manualSequence;
+                
+                let manStr = manualSequence.map(n => `${n.displayNo}(${n.type==='PICK'?'P':'D'})`).join(' ➔ ');
+                let grdStr = greedySequence.map(n => `${n.displayNo}(${n.type==='PICK'?'P':'D'})`).join(' ➔ ');
+                
+                document.getElementById('chain-seq-compare').innerHTML = `
+                    <div style="color:${!this.isGreedyMode ? 'var(--m3-primary)' : 'var(--m3-muted)'}">MANUAL: ${manStr || 'N/A'} (${manualDist.toFixed(1)}km)</div>
+                    <div style="margin-top:4px; color:${this.isGreedyMode ? 'var(--m3-primary)' : 'var(--m3-muted)'}">GREEDY: ${grdStr || 'N/A'} (${greedyDist.toFixed(1)}km)</div>
+                `;
+
                 document.getElementById('chain-net-display').innerText = totalNet.toFixed(1) + 'k';
-                document.getElementById('chain-kkm-display').innerText = activeDist > 0 ? (totalNet / activeDist).toFixed(1) + 'k/km' : '--k/km';
-                document.getElementById('chain-dist-display').innerText = `${activeDist.toFixed(1)}km`;
+                document.getElementById('chain-kkm-display').innerText = this.lastCalculatedDist > 0 ? (totalNet / this.lastCalculatedDist).toFixed(1) + 'k/km' : '--k/km';
+                document.getElementById('chain-dist-display').innerText = `${this.lastCalculatedDist.toFixed(1)}km`;
                 
-                const formatSeq = (seq) => seq.length > 0 ? seq.map(n => `[${n.displayNo}]${n.name}`).join(' ➔ ') : '--';
-                document.getElementById('bundle-seq-manual').innerText = `[MANUAL] ${formatSeq(manualSequence)} (${manualDist.toFixed(1)}km)`;
-                document.getElementById('bundle-seq-greedy').innerText = `[GREEDY] ${formatSeq(greedySequence)} (${greedyDist.toFixed(1)}km)`;
+                this.lastManualSeq = manualSequence.map(n => [n.coords.lat, n.coords.lng]);
+                this.lastGreedySeq = greedySequence.map(n => [n.coords.lat, n.coords.lng]);
                 
-                this.drawChainPolylineFromLatLngs(greedySequence.map(n=>[n.coords.lat, n.coords.lng]), manualSequence.map(n=>[n.coords.lat, n.coords.lng]), isGreedy);
+                let latlngs = activeSequence.map(n => [n.coords.lat, n.coords.lng]);
+                this.drawDualChainPolylines(null, latlngs);
             },
 
-            drawChainPolylineFromLatLngs: function(greedyL, manualL, isGreedy) {
+            drawDualChainPolylines: function(manualLatlngs, greedyLatlngs) {
                 this.clearChainPolyline();
-                if(!this.map) return;
-                
-                if (manualL.length > 1) {
-                    let p1 = L.polyline(manualL, { color: '#8e9099', weight: 3, dashArray: '4, 6', opacity: 0.6 }).addTo(this.map);
-                    this.chainMarkers.push(p1);
+                if(manualLatlngs && manualLatlngs.length > 1 && this.map) {
+                    this.chainPolylineManual = L.polyline(manualLatlngs, { color: '#005cbb', weight: 6, opacity: 0.3 }).addTo(this.map);
                 }
-                
-                if(greedyL.length > 1) {
-                    this.chainPolyline = L.polyline(greedyL, { color: '#ff3b30', weight: 4, dashArray: '6, 8', opacity: 0.9 }).addTo(this.map);
-                    for(let i=0; i<greedyL.length-1; i++) {
-                        let bearing = this.calcBearing(greedyL[i][0], greedyL[i][1], greedyL[i+1][0], greedyL[i+1][1]);
-                        let midLat = (greedyL[i][0] + greedyL[i+1][0])/2; let midLng = (greedyL[i][1] + greedyL[i+1][1])/2;
-                        let arrowIcon = L.divIcon({ className: 'marker-arrow', iconSize: [24, 24], html: `<div style="transform: rotate(${bearing - 90}deg); color: #ff3b30; font-size: 20px;">▶</div>` });
+                if(greedyLatlngs && greedyLatlngs.length > 1 && this.map) {
+                    this.chainPolyline = L.polyline(greedyLatlngs, { color: '#ff3b30', weight: 4, dashArray: '6, 8', opacity: 0.9 }).addTo(this.map);
+                    for(let i=0; i<greedyLatlngs.length-1; i++) {
+                        let bearing = this.calcBearing(greedyLatlngs[i][0], greedyLatlngs[i][1], greedyLatlngs[i+1][0], greedyLatlngs[i+1][1]);
+                        let midLat = (greedyLatlngs[i][0] + greedyLatlngs[i+1][0])/2; let midLng = (greedyLatlngs[i][1] + greedyLatlngs[i+1][1])/2;
+                        let distKm = this.calcCrow(greedyLatlngs[i][0], greedyLatlngs[i][1], greedyLatlngs[i+1][0], greedyLatlngs[i+1][1]).toFixed(1);
+                        
+                        let arrowIcon = L.divIcon({ 
+                            className: 'marker-arrow', iconSize: [40, 40], 
+                            html: `<div style="position:relative; display:flex; align-items:center; justify-content:center;">
+                                <div style="transform: rotate(${bearing - 90}deg); color: #ff3b30; font-size: 20px;">▶</div>
+                                <div style="position:absolute; top:-16px; font-size:9px; background:rgba(0,0,0,0.8); color:#fff; padding:2px 4px; border-radius:4px; text-shadow:none; white-space:nowrap;">${distKm}km</div>
+                            </div>` 
+                        });
                         let m = L.marker([midLat, midLng], {icon: arrowIcon}).addTo(this.map);
                         this.chainMarkers.push(m);
                     }
+                }
+            },
+
+            editBundleTimer: function() {
+                if(!this.bundleStartTime) return;
+                let d = new Date(this.bundleStartTime);
+                let currentStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                let newTime = prompt("B/PICK 시간 보정 (HH:MM)", currentStr);
+                if(newTime && /^\d{2}:\d{2}$/.test(newTime)) {
+                    let [h, m] = newTime.split(':');
+                    d.setHours(parseInt(h), parseInt(m), 0, 0);
+                    this.bundleStartTime = d.getTime();
+                    this.updateChainCalculation();
                 }
             },
 
@@ -972,7 +923,7 @@
                 QuickCalc.updateSysTotal();
                 QuickCalc.renderMasterList();
                 
-                let todayStr = new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0') + '-' + String(new Date().getDate()).padStart(2,'0');
+                let todayStr = new Date().toISOString().split('T')[0];
                 QuickCalc.autoSyncAndClear(todayStr);
                 
                 SystemModal.alert(`BUNDLE SAVED\nNET: ${totalNet.toFixed(1)}k\nTIME: ${elapsedMin}min\nEFF: ${kh}k/h | ${kkm}k/km`);
@@ -983,89 +934,8 @@
 
             applyChainSearch: function() {
                 toggleModal('popChainCalc');
+                this.drawDualChainPolylines(this.lastManualSeq, this.lastGreedySeq);
                 this.autofitActiveBounds();
-            },
-
-            executeMultiNavi: function() {
-                this.naviSelectedOrders = [];
-                this.renderNaviOrderList();
-                toggleModal('popMultiNavi');
-            },
-
-            renderNaviOrderList: function() {
-                const listEl = document.getElementById('navi-order-list');
-                listEl.innerHTML = '';
-                const displayEl = document.getElementById('navi-sequence-display');
-                displayEl.innerText = this.naviSelectedOrders.length > 0 ? this.naviSelectedOrders.map(o => QuickCalc.sanitize(o.routeSummary.split('➔')[1] || o.routeSummary)).join(' ➔ ') : 'SELECT ORDERS (MAX 5)';
-
-                let pickedOrders = QuickCalc.orders.filter(o => o.state === 'PICK' || o.state === 'RUN');
-                if (pickedOrders.length === 0) {
-                    listEl.innerHTML = '<div style="color:var(--m3-outline); text-align:center; font-size:11px;">NO ACTIVE ORDERS</div>';
-                    return;
-                }
-
-                pickedOrders.forEach(o => {
-                    const isSelected = this.naviSelectedOrders.some(x => x.id === o.id);
-                    const orderBtn = document.createElement('button');
-                    orderBtn.className = 'btn-core';
-                    orderBtn.style.height = '36px';
-                    orderBtn.style.fontSize = '12px';
-                    orderBtn.style.margin = '0';
-                    orderBtn.style.textTransform = 'none';
-                    if (isSelected) {
-                        orderBtn.style.background = 'var(--m3-primary-cont)';
-                        orderBtn.style.color = 'var(--m3-on-primary-cont)';
-                    } else {
-                        orderBtn.style.background = 'var(--m3-surface)';
-                        orderBtn.style.color = 'var(--m3-surf-text)';
-                        orderBtn.style.border = '1px solid var(--m3-outline-variant)';
-                    }
-                    
-                    let safeRoute = QuickCalc.sanitize(o.routeSummary);
-                    orderBtn.innerText = `[${o.displayNo}] ${safeRoute}`;
-                    orderBtn.onclick = () => this.toggleNaviOrderSelection(o);
-                    listEl.appendChild(orderBtn);
-                });
-            },
-
-            toggleNaviOrderSelection: function(order) {
-                const index = this.naviSelectedOrders.findIndex(x => x.id === order.id);
-                if (index !== -1) {
-                    this.naviSelectedOrders.splice(index, 1);
-                } else {
-                    if (this.naviSelectedOrders.length >= 5) {
-                        SystemModal.alert("MAX 5 CALLS SUPPORTED.");
-                        return;
-                    }
-                    this.naviSelectedOrders.push(order);
-                }
-                this.renderNaviOrderList();
-            },
-
-            resetNaviSequence: function() {
-                this.naviSelectedOrders = [];
-                this.renderNaviOrderList();
-            },
-
-            launchMultiNaviWithSequence: function() {
-                if (this.naviSelectedOrders.length === 0) { SystemModal.alert("SELECT ORDERS FIRST"); return; }
-                
-                let destOrder = this.naviSelectedOrders[this.naviSelectedOrders.length - 1];
-                let viaOrders = this.naviSelectedOrders.slice(0, this.naviSelectedOrders.length - 1);
-
-                if (!destOrder.endCoords) { SystemModal.alert("INVALID COORDINATES OR ADDRESS"); return; }
-
-                let baseUrl = `kakaomap://route?ep=${destOrder.endCoords.lat},${destOrder.endCoords.lng}&by=CAR`;
-                let vpParams = ['vp', 'vp2', 'vp3', 'vp4'];
-                viaOrders.forEach((v, i) => {
-                    if (v.endCoords && vpParams[i]) {
-                        baseUrl += `&${vpParams[i]}=${v.endCoords.lat},${v.endCoords.lng}`;
-                    }
-                });
-
-                showToast("LAUNCHING KAKAO MAP");
-                toggleModal('popMultiNavi');
-                setTimeout(() => { window.location.href = baseUrl; }, 500);
             },
 
             calcBearing: function(lat1, lon1, lat2, lon2) {
@@ -1546,7 +1416,7 @@
             },
 
             autoSyncAndClear: async function(newDateStr) {
-                if (this.orders.length === 0) return;
+                if (this.orders.length === 0 && this.loadDataSafely('qcp_bundle_logs_v203', []).length === 0) return;
                 const url = localStorage.getItem('qcp_url_sync'); if (!url) return;
                 try {
                     const payloadData = this.orders.map(o => ({
@@ -1555,18 +1425,18 @@
                         netFare: Math.round(this.calcNetFare(o.fareK, o.platform) * 1000), memo: o.memo || ""
                     }));
                     const bundleLogs = this.loadDataSafely('qcp_bundle_logs_v203', []);
-                    const finalPayload = { date: new Date().getFullYear() + '-' + String(new Date().getMonth()+1).padStart(2,'0') + '-' + String(new Date().getDate()).padStart(2,'0'), data: payloadData, bundles: bundleLogs };
+                    const finalPayload = { date: new Date().toISOString().split('T')[0], data: payloadData, bundles: bundleLogs };
                     
                     const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(finalPayload) });
                     const resText = await res.text();
-                    let resJson = {};
-                    try { resJson = JSON.parse(resText); } catch(err) { throw new Error("Server response is not valid JSON."); }
                     
-                    if(resJson.result === "success") {
-                        this.orders = []; this.safeSetStorage('qcp_orders_v203', JSON.stringify(this.orders)); this.safeSetStorage('qcp_bundle_logs_v203', JSON.stringify([])); 
-                        if(newDateStr) localStorage.setItem('qcp_last_sync_date', newDateStr); this.renderMasterList(); this.updateSysTotal(); showToast("SYNC & CLEARED");
-                    }
-                } catch (error) { showToast("SYNC ERROR"); console.error(error); }
+                    this.orders = []; this.safeSetStorage('qcp_orders_v203', JSON.stringify(this.orders)); this.safeSetStorage('qcp_bundle_logs_v203', JSON.stringify([])); 
+                    this.renderMasterList(); this.updateSysTotal(); showToast("SYNC & CLEARED");
+                    
+                } catch (error) { 
+                    showToast("SYNC ERROR"); console.error(error);
+                    localStorage.removeItem('qcp_last_sync_date'); 
+                }
             }
         };
 
