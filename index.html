@@ -510,8 +510,9 @@
                         (err) => { 
                             let msg = "ERROR"; if(err.code === 1) msg = "DENIED"; else if(err.code === 3) msg = "TIMEOUT";
                             document.getElementById('gps-text').innerText = msg; 
-                            setTimeout(() => badge.style.display = 'none', 4000);
-                        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                            setTimeout(() => badge.style.display = 'none', 2000);
+                        }, 
+                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 30000 }
                     );
                 }
             },
@@ -531,7 +532,7 @@
                 const badge = document.getElementById('gps-badge');
                 document.getElementById('gps-text').innerText = txt;
                 badge.style.display = 'block';
-                setTimeout(() => badge.style.display = 'none', 10000);
+                setTimeout(() => badge.style.display = 'none', 2000);
             },
 
             autofitActiveBounds: function(fallbackLat, fallbackLng) {
@@ -738,8 +739,10 @@
             toggleGreedyMode: function() {
                 this.isGreedyMode = !this.isGreedyMode;
                 let btn = document.getElementById('btn-greedy-toggle');
-                if(this.isGreedyMode) { btn.style.background = 'var(--m3-primary)'; btn.style.color = 'var(--m3-on-primary)'; }
-                else { btn.style.background = 'transparent'; btn.style.color = 'var(--m3-primary)'; }
+                if (btn) {
+                    btn.style.background = this.isGreedyMode ? 'var(--m3-primary)' : 'transparent';
+                    btn.style.color = this.isGreedyMode ? 'var(--m3-on-primary)' : 'var(--m3-primary)';
+                }
                 this.updateChainCalculation();
             },
 
