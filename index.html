@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#111315" id="meta-theme-color">
-    <title>QuickCalc Pro (v2.0.7)</title>
+    <title>QuickCalc Pro (v2.0.8)</title>
     
     <script>
-        // database.js : QuickCalc Pro v2.0.7 Core POI Database
+        // database.js : QuickCalc Pro v2.0.8 Core POI Database
         const SUBWAY_DATA = [
           {"name":"서울","lat":37.55315,"lng":126.972533}, {"name":"시청","lat":37.56359,"lng":126.975407},
           {"name":"종각","lat":37.570203,"lng":126.983116}, {"name":"종로3가","lat":37.570429,"lng":126.992095},
@@ -76,8 +76,14 @@
         .mt-16 { margin-top: 16px; }
         .text-center { text-align: center; } .text-bold { font-weight: 800; }
 
-        /* System Bar */
-        .sys-bar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; height: 52px; background: var(--m3-surface); padding: 0 16px; flex-shrink: 0; z-index: 1000; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        /* System Bar (v2.0.8: Safe Area Top Handled) */
+        .sys-bar { 
+            display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; 
+            height: calc(52px + env(safe-area-inset-top, 0px)); 
+            background: var(--m3-surface); 
+            padding: env(safe-area-inset-top, 0px) 16px 0 16px; 
+            flex-shrink: 0; z-index: 1000; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+        }
         .sys-left { display: flex; align-items: center; gap: 8px; justify-self: start; }
         .sys-mid { font-size: 18px; font-weight: 900; color: var(--m3-primary); white-space: nowrap; justify-self: center; }
         .sys-right { display: flex; align-items: center; justify-self: end; }
@@ -123,7 +129,7 @@
         .eff-badge { background: var(--m3-surface-low); color: var(--m3-primary); font-size: 15px; font-weight: 900; padding: 10px 12px; border-radius: 8px; text-align: center; border: 2px dashed var(--m3-primary); margin-bottom: 12px; display: none; }
         .eff-badge .sub-txt { font-size: 11px; color: var(--m3-muted); font-weight: 700; margin-left: 6px; }
 
-        /* LST Table */
+        /* LST Table (v2.0.8: Adjusted column width) */
         .list-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-bottom: 24px; background: var(--m3-surface); border-radius: 12px; border: 1px solid var(--m3-outline-variant); }
         #lst-summary-bar { flex-shrink: 0; background: var(--m3-primary-cont); color: var(--m3-on-primary-cont); text-align: center; font-size: 12px; font-weight: 900; padding: 10px; border-radius: 10px; margin-bottom: 8px; }
         
@@ -161,24 +167,24 @@
         
         .gps-badge { position: absolute; top: 90px; left: 50%; transform: translateX(-50%); background: var(--m3-surface); border-radius: 12px; color: var(--m3-surf-text); font-size: 12px; font-weight: 900; padding: 6px 14px; z-index: 2000; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: none; text-align: center; border: 1px solid var(--m3-outline-variant); }
         
-        .btn-radar-float { position: absolute; right: 16px; width: 44px; height: 44px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; transition: background 0.2s; text-transform: uppercase; line-height: 1.1; }
-        
-        .btn-gps { bottom: 16px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
-        .btn-map-lock { bottom: 72px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
-        .btn-map-lock.locked { background: var(--m3-error); border-color: var(--m3-error); }
-        .btn-heatmap { bottom: 128px; background: rgba(30,30,30,0.9); backdrop-filter: blur(4px); }
-        .btn-heatmap.active { background: #ff3b30; border-color: #ff3b30; }
-        
-        .btn-bundle { position: absolute; bottom: 72px; left: 16px; width: 44px; height: 44px; border-radius: 22px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.4); backdrop-filter: blur(4px); cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; transition: background 0.2s; line-height: 1.1; }
+        .btn-bundle { position: absolute; bottom: 32px; left: 16px; width: 48px; height: 48px; border-radius: 24px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; z-index: 2000; box-shadow: 0 4px 16px rgba(0,0,0,0.4); backdrop-filter: blur(4px); cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; transition: background 0.2s; line-height: 1.1; }
         .btn-bundle.active { background: var(--m3-error); border-color: var(--m3-error); }
 
-        /* POI Mini Buttons: Moved to right side to prevent overlap with Quick Select */
-        .poi-container { position: absolute; bottom: 184px; right: 16px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; }
-        .btn-poi { width: 44px; height: 44px; border-radius: 22px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer; color: #fff; transition: transform 0.1s; }
-        .btn-poi:active { transform: scale(0.9); }
+        /* v2.0.8: Radial Speed Dial Menu */
+        .radial-wrapper { position: absolute; bottom: 24px; right: 16px; z-index: 2000; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .radial-menu { display: flex; flex-direction: column; gap: 10px; opacity: 0; pointer-events: none; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .radial-menu.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        
+        .fab-main { width: 52px; height: 52px; border-radius: 26px; background: var(--m3-surface-low); color: var(--m3-surf-text); border: 2px solid var(--m3-outline-variant); font-size: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 2001; }
+        .fab-main.open { transform: rotate(45deg); background: var(--m3-primary); color: var(--m3-on-primary); border-color: var(--m3-primary); }
+        
+        .fab-sub { width: 44px; height: 44px; border-radius: 22px; background: rgba(30,30,30,0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 900; font-size: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, transform 0.1s; backdrop-filter: blur(4px); }
+        .fab-sub:active { transform: scale(0.9); }
+        .fab-sub.active { background: var(--m3-error); border-color: var(--m3-error); }
+        .fab-sub.icon { font-size: 18px; }
 
         /* Quick Select Container */
-        .quick-sel-container { position: absolute; bottom: 16px; left: 16px; display: flex; gap: 8px; z-index: 2000; overflow-x: auto; max-width: calc(100% - 80px); padding: 12px 4px; align-items: center; }
+        .quick-sel-container { position: absolute; bottom: 84px; left: 16px; display: flex; gap: 8px; z-index: 2000; overflow-x: auto; max-width: calc(100% - 80px); padding: 12px 4px; align-items: center; }
         .q-sel-btn { width: 40px; height: 40px; border-radius: 20px; border: 2px solid; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; background: rgba(0,0,0,0.8); cursor: pointer; color: #fff; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); flex-shrink: 0; }
         .q-sel-btn.active { background: currentColor; color: #000; transform: scale(1.15); }
 
@@ -191,16 +197,23 @@
         .pulse-ring { border: 3px solid rgba(0,235,255,0.6); border-radius: 50%; height: 34px; width: 34px; position: absolute; left: -2px; top: -2px; animation: pulsate 1.5s ease-out infinite; z-index: 1; pointer-events: none; }
         @keyframes pulsate { 0% { transform: scale(0.3); opacity: 1; } 100% { transform: scale(1.2); opacity: 0; } }
 
-        /* Modals & Nav */
+        /* Modals & Nav (v2.0.8: Safe Area Bottom Handled) */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 9000; padding: 20px; backdrop-filter: blur(4px); }
         .modal-overlay.show { display: flex; }
         .modal-body { background: var(--m3-surface); border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid var(--m3-outline-variant); }
         
-        .nav-bar { height: 64px; background: var(--m3-surface); display: flex; border-top: 1px solid var(--m3-outline-variant); flex-shrink: 0; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
+        .nav-bar { 
+            height: calc(64px + env(safe-area-inset-bottom, 0px)); 
+            background: var(--m3-surface); display: flex; 
+            border-top: 1px solid var(--m3-outline-variant); flex-shrink: 0; 
+            justify-content: space-around; align-items: center; 
+            padding-bottom: env(safe-area-inset-bottom, 0px); z-index: 1000; 
+        }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; color: var(--m3-muted); cursor: pointer; height: 100%; transition: color 0.2s; }
         .nav-item.active { color: var(--m3-primary); }
         
-        #toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: rgba(50,50,50,0.95); color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 13px; font-weight: 800; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
+        /* v2.0.8: Toast position aware of Safe Area Top */
+        #toast { position: fixed; top: calc(60px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); background: rgba(50,50,50,0.95); color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 13px; font-weight: 800; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
         #toast.show { opacity: 1; }
         
         .sys-header { text-align: center; font-size: 12px; color: var(--m3-primary); margin-bottom: 16px; font-weight: 900; }
@@ -321,7 +334,7 @@
             
             <div class="list-wrapper">
                 <table class="sheet-table">
-                    <thead><tr><th style="width:8%;">NO</th><th style="width:14%;">SHIFT</th><th style="width:8%;">P</th><th style="width:42%;">ROUTE</th><th style="width:14%;">NET</th><th style="width:14%;">ACT</th></tr></thead>
+                    <thead><tr><th style="width:8%;">NO</th><th style="width:14%;">SHIFT</th><th style="width:14%;">PLAT</th><th style="width:36%;">ROUTE</th><th style="width:14%;">NET</th><th style="width:14%;">ACT</th></tr></thead>
                     <tbody id="master-list-tbody"></tbody>
                 </table>
             </div>
@@ -335,15 +348,18 @@
             <div id="radar-hud" class="radar-hud" onclick="GeosticsOS.toggleHUD()"></div>
             <div id="gps-badge" class="gps-badge"><span id="gps-text"></span></div>
             
-            <button class="btn-radar-float btn-heatmap" id="btn-heatmap" onclick="GeosticsOS.toggleHeatmap()">HEAT</button>
-            <button class="btn-radar-float btn-map-lock" id="btn-map-lock" onclick="GeosticsOS.toggleMapLock()">LOCK</button>
-            <button class="btn-bundle" id="btn-chain-calc" onclick="GeosticsOS.openChainCalcModal()">BUNDLE<br>BOX</button>
-            <button class="btn-radar-float btn-gps" onclick="GeosticsOS.fetchManualGPS()">GPS</button>
-            
-            <div class="poi-container" id="poi-btn-group">
-                <button class="btn-poi" onclick="GeosticsOS.searchNearestPOI('SUBWAY')" title="SEARCH SUBWAY">🚇</button>
-                <button class="btn-poi" onclick="GeosticsOS.searchNearestPOI('MALL')" title="SEARCH MALL">🏢</button>
+            <div class="radial-wrapper">
+                <div class="radial-menu" id="radial-menu">
+                    <button class="fab-sub icon" onclick="GeosticsOS.searchNearestPOI('MALL')" title="SEARCH MALL">🏢</button>
+                    <button class="fab-sub icon" onclick="GeosticsOS.searchNearestPOI('SUBWAY')" title="SEARCH SUBWAY">🚇</button>
+                    <button class="fab-sub" id="btn-heatmap" onclick="GeosticsOS.toggleHeatmap()">HEAT</button>
+                    <button class="fab-sub" id="btn-map-lock" onclick="GeosticsOS.toggleMapLock()">LOCK</button>
+                    <button class="fab-sub" onclick="GeosticsOS.fetchManualGPS()">GPS</button>
+                </div>
+                <button class="fab-main" id="fab-main" onclick="GeosticsOS.toggleRadialMenu()">➕</button>
             </div>
+            
+            <button class="btn-bundle" id="btn-chain-calc" onclick="GeosticsOS.openChainCalcModal()">BUNDLE<br>BOX</button>
 
             <div id="radar-quick-sel" class="quick-sel-container"></div>
             
@@ -370,7 +386,7 @@
 
     <div class="modal-overlay" id="popSet" onclick="if(event.target===this) toggleModal('popSet')">
         <div class="modal-body">
-            <div class="sys-header">Geostics Base OS (v2.0.7)</div>
+            <div class="sys-header">Geostics Base OS (v2.0.8)</div>
             <div class="flex-between mb-16"><div class="text-bold" style="font-size:14px;">SETTINGS</div></div>
             <div class="flex-between mb-16">
                 <div class="text-bold" style="font-size:12px; color:var(--m3-muted);">KEEP SCREEN ON</div>
@@ -450,15 +466,15 @@
                 </div>
             </div>
 
-            <div class="flex-between gap-8" style="margin-bottom:8px;">
-                <button class="btn-core" style="background:var(--m3-surface-low); color:var(--m3-error); flex:0.5;" onclick="GeosticsOS.bundleReset()">RESET</button>
+            <div class="flex-between gap-8" style="margin-bottom:12px;">
                 <button class="btn-core" style="background:var(--m3-primary-cont); color:var(--m3-on-primary-cont); flex:1;" onclick="GeosticsOS.bundlePick()">B/PICK</button>
                 <button class="btn-core btn-red" style="flex:1;" onclick="GeosticsOS.bundleDone()">B/DONE</button>
             </div>
             
             <div class="flex-between gap-8">
-                <button class="btn-core" style="background:#fae100; color:#3c1e1e; flex:1;" onclick="GeosticsOS.launchKakaoMultiNavi()">KAKAO NAVI</button>
-                <button class="btn-core" style="background:var(--m3-surface-low); color:var(--m3-surf-text); flex:1;" onclick="GeosticsOS.applyChainSearch()">FIT MAP</button>
+                <button class="btn-core" style="height:38px; font-size:11px; background:var(--m3-surface-low); color:var(--m3-error); flex:1;" onclick="GeosticsOS.bundleReset()">RESET</button>
+                <button class="btn-core" style="height:38px; font-size:11px; background:#fae100; color:#3c1e1e; flex:1;" onclick="GeosticsOS.launchKakaoMultiNavi()">MULTI NAVI</button>
+                <button class="btn-core" style="height:38px; font-size:11px; background:var(--m3-surface-low); color:var(--m3-surf-text); flex:1;" onclick="GeosticsOS.applyChainSearch()">FIT MAP</button>
             </div>
         </div>
     </div>
@@ -553,17 +569,25 @@
                 if (window.ResizeObserver) { new ResizeObserver(() => { if (this.map) this.map.invalidateSize(); }).observe(document.getElementById('view-map')); }
             },
 
+            // v2.0.8: Radial Menu Toggle
+            toggleRadialMenu: function() {
+                const menu = document.getElementById('radial-menu');
+                const fab = document.getElementById('fab-main');
+                menu.classList.toggle('open');
+                fab.classList.toggle('open');
+            },
+
             toggleMapLock: function() {
                 this.mapLocked = !this.mapLocked;
                 const btn = document.getElementById('btn-map-lock');
                 if (this.mapLocked) {
                     this.map.dragging.disable(); this.map.touchZoom.disable(); this.map.doubleClickZoom.disable();
                     this.map.scrollWheelZoom.disable(); if(this.map.keyboard) this.map.keyboard.disable();
-                    btn.innerText = 'UNLOCK'; btn.classList.add('locked'); showToast("MAP LOCKED");
+                    btn.innerText = 'UNLK'; btn.classList.add('active'); showToast("MAP LOCKED");
                 } else {
                     this.map.dragging.enable(); this.map.touchZoom.enable(); this.map.doubleClickZoom.enable();
                     this.map.scrollWheelZoom.enable(); if(this.map.keyboard) this.map.keyboard.disable();
-                    btn.innerText = 'LOCK'; btn.classList.remove('locked'); showToast("MAP UNLOCKED");
+                    btn.innerText = 'LOCK'; btn.classList.remove('active'); showToast("MAP UNLOCKED");
                 }
             },
 
@@ -622,8 +646,8 @@
                 let minD = Infinity; let nearest = null;
                 targetData.forEach(item => { let d = this.calcCrow(currentLat, currentLng, item.lat, item.lng); if (d < minD) { minD = d; nearest = item; } });
 
-                if (minD <= 3.0 && nearest) { SystemModal.alert(`[${type}] NEAREST IN 3KM\n\n📌 ${nearest.name}\nDIST: ${minD.toFixed(1)}km`); } 
-                else { showToast("NO POI WITHIN 3KM"); }
+                if (minD <= 3.0 && nearest) { SystemModal.alert(`[${type}] NEAREST IN 3km\n\n📌 ${nearest.name}\nDIST: ${minD.toFixed(1)}km`); } 
+                else { showToast("NO POI WITHIN 3km"); }
             },
 
             toggleHeatmap: function() {
@@ -998,6 +1022,7 @@
             updateSysTotal: function() { let t=0; this.orders.forEach(o => t+=this.calcNetFare(o.fareK, o.platform)); document.getElementById('sysTotalRev').innerText = t.toFixed(1) + 'k'; },
             updateShiftBadge: function() { const h = new Date().getHours(); const s = this.SHIFTS.find(x => h >= x.start && h < x.end) || this.SHIFTS[0]; document.getElementById('sysQtrBadge').innerText = s.id; return s.id; },
             
+            // v2.0.8: Realtime Sync dynamically loads orders upon trigger
             openTimeTable: function() {
                 const listEl = document.getElementById('timetable-list'); listEl.innerHTML = ''; const currentH = new Date().getHours();
                 
@@ -1143,6 +1168,7 @@
             setSubFilter: function(sf) { this.currentSubFilter = sf; document.getElementById('sub-all').classList.toggle('active', sf==='ALL'); document.getElementById('sub-quicks').classList.toggle('active', sf==='QUICKS'); document.getElementById('sub-eats').classList.toggle('active', sf==='EATS'); this.renderMasterList(); },
             clearList: function() { SystemModal.confirm('CLEAR ALL?', () => { this.orders = []; this.safeSetStorage('qcp_orders_v203', JSON.stringify(this.orders)); this.renderMasterList(); this.updateSysTotal(); showToast("CLEARED"); }); },
 
+            // v2.0.8: Render Platform Fullname Support
             renderMasterList: function() {
                 const tbody = document.getElementById('master-list-tbody'); tbody.innerHTML = '';
                 let filtered = this.orders.filter(o => this.currentFilter === 'RUN' ? o.state !== 'DONE' : o.state === 'DONE');
@@ -1164,12 +1190,13 @@
                     tr.setAttribute('onpointerdown', `QuickCalc.startPress('${o.id}', event)`); tr.setAttribute('onpointerup', `QuickCalc.cancelPress(event)`); tr.setAttribute('onpointercancel', `QuickCalc.cancelPress(event)`); tr.setAttribute('onpointermove', `QuickCalc.cancelPress(event)`); tr.setAttribute('onclick', `QuickCalc.triggerFullscreenView('${o.id}')`);
                     
                     let badgeHTML = ''; if (this.currentFilter === 'DONE' && this.currentSubFilter === 'ALL') { badgeHTML = o.mode === 'QUICKS' ? `<span class="badge-q">Q</span>` : `<span class="badge-e">E</span>`; }
-                    let sanitizedRoute = this.sanitize(o.routeSummary); let platInitial = o.platform.charAt(0);
+                    let sanitizedRoute = this.sanitize(o.routeSummary);
+                    let platName = o.platform;
 
                     tr.innerHTML = `
                     <td>${o.displayNo}</td>
                     <td><span style="font-weight:800;">${o.shift}</span></td>
-                    <td style="font-weight:900;">${badgeHTML}${platInitial}</td>
+                    <td style="font-weight:900; font-size:9px; letter-spacing:-0.5px;">${badgeHTML} ${platName}</td>
                     <td style="text-align:left;">
                         <div class="tbl-route">${sanitizedRoute}</div>
                         <div class="tbl-time">${timeStr}</div>
